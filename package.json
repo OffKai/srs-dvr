@@ -1,0 +1,68 @@
+{
+	"name": "@offkai/srs-dvr",
+	"version": "0.0.1",
+	"author": "killbasa <killbasa@offkaiexpo.com>",
+	"license": "Apache-2.0",
+	"private": true,
+	"type": "module",
+	"bugs": {
+		"url": "https://github.com/OffKai/srs-dvr/issues"
+	},
+	"homepage": "https://github.com/OffKai/srs-dvr#readme",
+	"scripts": {
+		"dev": "NODE_ENV=development tsup --watch --onSuccess \"yarn start\"",
+		"build": "yarn check && NODE_ENV=development tsup",
+		"build:prod": "yarn check && tsup",
+		"start": "node --enable-source-maps dist/main.js",
+		"check": "tsc",
+		"lint": "eslint --fix",
+		"format": "prettier --write .",
+		"test": "vitest --coverage --run",
+		"test:watch": "vitest --watch",
+		"dry-run": "yarn check && yarn build && yarn test",
+		"docker": "docker buildx build -t offkai/srs-dvr .",
+		"prepare": "husky"
+	},
+	"dependencies": {
+		"@aws-sdk/client-s3": "^3.735.0",
+		"@azure/storage-blob": "^12.26.0",
+		"fastify": "^5.2.1",
+		"pino-pretty": "^13.0.0",
+		"zod": "^3.24.1"
+	},
+	"devDependencies": {
+		"@eslint/js": "^9.19.0",
+		"@swc/core": "1.10.9",
+		"@types/node": "^22.10.10",
+		"@typescript-eslint/parser": "^8.21.0",
+		"@vitest/coverage-v8": "^3.0.4",
+		"eslint": "^9.19.0",
+		"eslint-config-prettier": "^10.0.1",
+		"eslint-plugin-prettier": "^5.2.3",
+		"globals": "^15.14.0",
+		"husky": "^9.1.7",
+		"lint-staged": "^15.4.2",
+		"prettier": "^3.4.2",
+		"tsup": "^8.3.6",
+		"tsx": "^4.19.2",
+		"typescript": "5.7.3",
+		"typescript-eslint": "^8.21.0",
+		"vitest": "^3.0.4"
+	},
+	"lint-staged": {
+		"*.{js,cjs,ts}": [
+			"eslint --fix"
+		],
+		"*.{js,cjs,ts,json,yml,yaml}": [
+			"prettier --write --log-level=warn \"**/*.{js,cjs,ts,json,yml,yaml}\""
+		]
+	},
+	"engines": {
+		"node": "22.x"
+	},
+	"packageManager": "yarn@4.6.0",
+	"volta": {
+		"node": "22.13.1",
+		"yarn": "4.6.0"
+	}
+}

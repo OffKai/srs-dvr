@@ -1,0 +1,16 @@
+{
+	"extends": "./tsconfig.json",
+	"compilerOptions": {
+		"allowJs": true,
+		"checkJs": true
+	},
+	"include": [
+		"src", //
+		"tests",
+		".prettierrc.cjs",
+		"eslint.config.js",
+		"tsup.config.ts",
+		"vitest.config.ts",
+		"vitest.workspace.ts"
+	]
+}
