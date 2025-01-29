@@ -1,4 +1,5 @@
 .yarn/install-state.gz
+data/
 dist/
 node_modules/
 .env

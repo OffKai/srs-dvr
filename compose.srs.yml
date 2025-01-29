@@ -1,0 +1,21 @@
+services:
+  srs:
+    image: ossrs/srs:v6.0.155
+    restart: unless-stopped
+    environment:
+      SRS_CONFIG_FILE: /opt/conf/origin.conf
+      SRS_VHOST_HTTP_HOOKS_ON_DVR: http://localhost:3001/v1/azure
+      SRS_HTTP_API_AUTH_PASSWORD: admin
+      SRS_EXPORTER_ENABLED: on
+    env_file:
+      - .env
+    network_mode: host # Need to send webhooks to localhost
+    # ports:
+    #   - 127.0.0.1:1935:1935/tcp # RTMP
+    #   - 127.0.0.1:1985:1985/tcp # API
+    #   - 127.0.0.1:8080:8080/tcp # HTTP Live Streaming
+    #   - 127.0.0.1:8000:8000/udp # WebRTC
+    #   - 127.0.0.1:9972:9972/tcp # Prometheus metrics @ /metrics
+    volumes:
+      - ./.configs/srs/origin.conf:/opt/conf/origin.conf
+      - ./data:/data

@@ -1,0 +1,21 @@
+server:
+  log_level: info
+
+metrics:
+  wal_directory: /tmp/agent
+  global:
+    scrape_interval: 30s
+    remote_write:
+      - url: http://localhost:9090/api/v1/write
+  configs:
+    - name: default
+      scrape_configs:
+        - job_name: srs
+          metrics_path: /metrics
+          scrape_interval: 5s
+          static_configs:
+            - targets: ["localhost:9972"]
+        - job_name: dvr
+          metrics_path: /metrics
+          static_configs:
+            - targets: ["localhost:3001"]
