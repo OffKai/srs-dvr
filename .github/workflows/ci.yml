@@ -26,8 +26,10 @@ jobs:
       - name: Run build
         run: yarn build
 
-      - name: Run linting and formatting
-        run: yarn check
+      - name: Run typechecking and linting
+        run: |
+          yarn check
+          yarn lint
 
       - name: Run tests
         run: yarn test

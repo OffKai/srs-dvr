@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { loadEnvFile } from 'node:process';
 
+// Load .env file if it exists
 if (existsSync(resolve('.env'))) {
 	loadEnvFile();
 }
@@ -17,7 +18,7 @@ const ConfigSchema = z.object({
 
 const obj = {
 	VERSION: process.env.npm_package_version,
-	PORT: 3001,
+	PORT: process.env.PORT ?? 3001,
 	AZURE_CONNECTION_STRING: undefined,
 	S3_ACCESS_KEY_ID: undefined,
 	S3_SECRET_ACCESS_KEY: undefined
