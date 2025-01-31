@@ -1,14 +1,10 @@
 import type { FastifyPluginAsync } from 'fastify';
 import { DvrWebhookPayloadSchema } from './lib/types.js';
-import { resolve } from 'node:path';
-import { stat } from 'node:fs/promises';
+import { basename, resolve } from 'node:path';
+import { upload } from './lib/azure.js';
 
 export const routes: FastifyPluginAsync = async (server) => {
 	server.get('/ping', async (_, res) => {
-		await res.status(200).send({ message: 'OK' });
-	});
-
-	server.post('/v1/s3', async (_, res) => {
 		await res.status(200).send({ message: 'OK' });
 	});
 
@@ -18,12 +14,11 @@ export const routes: FastifyPluginAsync = async (server) => {
 			return await res.status(400).send({ code: 1 });
 		}
 
-		const path = resolve(`.${payload.data.file}`);
-		const stats = await stat(path);
-
-		server.log.info(`File size: ${(stats.size / 1024).toFixed(2)} KB`);
-
 		await res.status(200).send({ code: 0 });
+
+		const path = resolve(`.${payload.data.file}`);
+		const filename = basename(payload.data.file);
+		await upload(filename, path);
 	});
 
 	server.log.info('Routes loaded');

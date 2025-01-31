@@ -1,7 +1,7 @@
 import Fastify from 'fastify';
 import { isDev, isTesting } from './lib/constants.js';
 
-export function buildServer() {
+function buildServer() {
 	const server = Fastify({
 		disableRequestLogging: !isDev,
 		logger: {
@@ -23,3 +23,5 @@ export function buildServer() {
 
 	return server;
 }
+
+export const server = buildServer();

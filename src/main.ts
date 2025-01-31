@@ -1,8 +1,6 @@
 import { config } from './lib/config.js';
 import { routes } from './routes.js';
-import { buildServer } from './server.js';
-
-const server = buildServer();
+import { server } from './server.js';
 
 const start = async (): Promise<void> => {
 	try {

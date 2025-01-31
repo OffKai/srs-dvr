@@ -11,7 +11,7 @@ if (existsSync(resolve('.env'))) {
 const ConfigSchema = z.object({
 	VERSION: z.string(),
 	PORT: z.coerce.number(),
-	AZURE_CONNECTION_STRING: z.undefined(),
+	AZURE_CONNECTION_STRING: z.string(),
 	S3_ACCESS_KEY_ID: z.undefined(),
 	S3_SECRET_ACCESS_KEY: z.undefined()
 });
@@ -19,7 +19,7 @@ const ConfigSchema = z.object({
 const obj = {
 	VERSION: process.env.npm_package_version,
 	PORT: process.env.PORT ?? 3001,
-	AZURE_CONNECTION_STRING: undefined,
+	AZURE_CONNECTION_STRING: process.env.AZURE_CONNECTION_STRING,
 	S3_ACCESS_KEY_ID: undefined,
 	S3_SECRET_ACCESS_KEY: undefined
 } satisfies Record<keyof z.infer<typeof ConfigSchema>, unknown>;
