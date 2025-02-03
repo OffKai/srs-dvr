@@ -1,38 +1,39 @@
 import { BlobServiceClient } from '@azure/storage-blob';
-import { server } from '../server.js';
 import { rm } from 'node:fs/promises';
-import { setTimeout } from 'node:timers';
 import { createReadStream } from 'node:fs';
+import { setTimeout } from 'node:timers';
+import { server } from '../server.js';
 
 const blobClient = BlobServiceClient.fromConnectionString(process.env.AZURE_CONNECTION_STRING!);
 
 const azureClient = blobClient.getContainerClient('srs-dvr');
 
-const retries = new Map<string, number>();
-
 export const upload = async (filename: string, path: string): Promise<void> => {
+	let attempt = 1;
 	const blockClient = azureClient.getBlockBlobClient(filename);
 	const stream = createReadStream(path);
 
 	const execute = async () => {
-		const attempt = retries.get(filename) ?? 0;
 		server.log.info(`Uploading file (${attempt}):`, filename);
 
 		try {
-			await blockClient.uploadStream(stream);
+			await blockClient.uploadStream(stream); // Test passes without await???
 		} catch (err: unknown) {
 			server.log.error(`Failed to upload file (${attempt}):`, err);
 
-			if (attempt >= 5) {
+			if (attempt > 5) {
 				server.log.error('Failed to upload file after 5 attempts:', filename);
 				return;
 			}
 
-			retries.set(filename, attempt + 1);
-			server.log.info(`Retrying upload (${attempt + 1}):`, filename);
+			server.log.warn(`Retrying upload (${attempt}):`, filename);
 
-			const delay = 1000 * Math.pow(2, attempt); // Tweak values
-			setTimeout(execute, delay);
+			const delay = 1000 * Math.pow(2, attempt - 1); // Tweak values
+			attempt += 1;
+			setTimeout(async () => {
+				console.log('EXECUTE');
+				await execute();
+			}, delay);
 			return;
 		}
 
@@ -40,10 +41,9 @@ export const upload = async (filename: string, path: string): Promise<void> => {
 			await rm(path);
 		} catch (err: unknown) {
 			server.log.error('Failed to delete file:', err);
-			// Remove retry count?
 		}
 
-		retries.delete(filename);
+		server.log.info(`File uploaded (${attempt}):'`, filename);
 	};
 
 	await execute();

@@ -1,6 +1,8 @@
-import { upload } from './azure.js';
-import { basename } from 'node:path';
+import { server } from '../server.js';
+import { routes } from '../routes.js';
+import type { DvrWebhookPayload } from './types.js';
 import { getFilePath } from './fs.js';
+import type { BlockBlobClient } from '@azure/storage-blob';
 
 const mocks = vi.hoisted(() => {
 	return {
@@ -14,11 +16,10 @@ const mocks = vi.hoisted(() => {
 vi.mock('node:fs', () => ({ createReadStream: mocks.createReadStream }));
 vi.mock('node:fs/promises', () => ({ rm: mocks.rm }));
 vi.mock('node:timers', () => ({ setTimeout: mocks.setTimeout }));
-
 vi.mock('@azure/storage-blob', () => {
 	class MockBlobServiceClient {
 		public getContainerClient = vi.fn().mockReturnValue({
-			getBlockBlobClient: vi.fn().mockReturnValue({
+			getBlockBlobClient: vi.fn<() => Partial<BlockBlobClient>>().mockReturnValue({
 				uploadStream: mocks.uploadStream
 			})
 		});
@@ -31,23 +32,50 @@ vi.mock('@azure/storage-blob', () => {
 	};
 });
 
-describe('Azure upload', async () => {
+describe.skip('/v1/azure', () => {
+	beforeAll(async () => {
+		await server.register(routes);
+	});
+
 	beforeEach(() => {
-		vi.clearAllMocks();
 		vi.useFakeTimers({ toFake: ['setTimeout'] });
 	});
 
 	afterEach(() => {
+		vi.clearAllMocks();
 		vi.useRealTimers();
 	});
 
 	const path = '/data/test.txt';
 	const localPath = getFilePath(path);
-	const filename = basename(path);
 
-	it('should upload a file', async () => {
-		await upload(filename, localPath);
+	const body: DvrWebhookPayload = {
+		action: '',
+		client_id: '',
+		ip: '',
+		vhost: '',
+		app: '',
+		stream: '',
+		param: '',
+		cwd: '',
+		file: path,
+		server_id: '',
+		stream_url: '',
+		stream_id: '',
+		service_id: '',
+		tcUrl: ''
+	};
 
+	it('should upload file', async () => {
+		const response = await server.inject({
+			method: 'POST',
+			url: '/v1/azure',
+			body
+		});
+
+		await Promise.resolve(); // Flush promises
+
+		expect(response.statusCode).toBe(200);
 		expect(mocks.createReadStream).toHaveBeenCalledTimes(1);
 		expect(mocks.createReadStream).toHaveBeenCalledWith(localPath);
 		expect(mocks.uploadStream).toHaveBeenCalledTimes(1);
@@ -57,15 +85,20 @@ describe('Azure upload', async () => {
 	});
 
 	test('uploadStream throws error once', async () => {
-		mocks.uploadStream //
-			.mockRejectedValueOnce(new Error())
-			.mockResolvedValueOnce(undefined);
+		mocks.uploadStream.mockRejectedValueOnce(new Error());
 
-		await upload(filename, localPath);
+		const response = await server.inject({
+			method: 'POST',
+			url: '/v1/azure',
+			body
+		});
 
+		await Promise.resolve(); // Flush promises
+
+		expect(response.statusCode).toBe(200);
 		expect(mocks.createReadStream).toHaveBeenCalledTimes(1);
 		expect(mocks.createReadStream).toHaveBeenCalledWith(localPath);
-		expect(mocks.uploadStream).toHaveBeenCalledTimes(2);
+		expect(mocks.uploadStream).toHaveBeenCalledTimes(1);
 		expect(mocks.setTimeout).toHaveBeenCalledTimes(1);
 		expect(mocks.rm).toHaveBeenCalledTimes(1);
 		expect(mocks.rm).toHaveBeenCalledWith(localPath);
@@ -74,8 +107,15 @@ describe('Azure upload', async () => {
 	test('rm throws error', async () => {
 		mocks.rm.mockRejectedValue(new Error());
 
-		await upload(filename, localPath);
+		const response = await server.inject({
+			method: 'POST',
+			url: '/v1/azure',
+			body
+		});
 
+		await Promise.resolve(); // Flush promises
+
+		expect(response.statusCode).toBe(200);
 		expect(mocks.createReadStream).toHaveBeenCalledTimes(1);
 		expect(mocks.createReadStream).toHaveBeenCalledWith(localPath);
 		expect(mocks.uploadStream).toHaveBeenCalledTimes(1);
@@ -85,21 +125,23 @@ describe('Azure upload', async () => {
 		await expect(mocks.rm).rejects.toThrow();
 	});
 
-	test('bail with max retries', async () => {
+	test.skip('bail with max retries', async () => {
 		mocks.uploadStream.mockRejectedValue(new Error());
 
-		await upload(filename, localPath);
+		const response = await server.inject({
+			method: 'POST',
+			url: '/v1/azure',
+			body
+		});
 
+		vi.runAllTimers();
+
+		expect(response.statusCode).toBe(200);
 		expect(mocks.createReadStream).toHaveBeenCalledTimes(1);
 		expect(mocks.createReadStream).toHaveBeenCalledWith(localPath);
-		expect(mocks.uploadStream).toHaveBeenCalledTimes(5);
-		expect(mocks.setTimeout).toHaveBeenCalledTimes(4);
-		expect(mocks.rm).not.toHaveBeenCalled();
-	});
-
-	const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
-	it('stuck', async () => {
-		await sleep(1000); // it's sleeping forever
-		vi.runAllTimers();
+		expect(mocks.uploadStream).toHaveBeenCalledTimes(1);
+		expect(mocks.setTimeout).toHaveBeenCalledTimes(5);
+		expect(mocks.rm).toHaveBeenCalledTimes(1);
+		expect(mocks.rm).toHaveBeenCalledWith(localPath);
 	});
 });

@@ -13,7 +13,8 @@ const ConfigSchema = z.object({
 	PORT: z.coerce.number(),
 	AZURE_CONNECTION_STRING: z.string(),
 	S3_ACCESS_KEY_ID: z.undefined(),
-	S3_SECRET_ACCESS_KEY: z.undefined()
+	S3_SECRET_ACCESS_KEY: z.undefined(),
+	FILE_ROOT: z.string()
 });
 
 const obj = {
@@ -21,7 +22,8 @@ const obj = {
 	PORT: process.env.PORT ?? 3001,
 	AZURE_CONNECTION_STRING: process.env.AZURE_CONNECTION_STRING,
 	S3_ACCESS_KEY_ID: undefined,
-	S3_SECRET_ACCESS_KEY: undefined
+	S3_SECRET_ACCESS_KEY: undefined,
+	FILE_ROOT: process.env.FILE_ROOT
 } satisfies Record<keyof z.infer<typeof ConfigSchema>, unknown>;
 
 export const config = ConfigSchema.parse(obj);
