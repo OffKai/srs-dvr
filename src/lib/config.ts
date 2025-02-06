@@ -11,19 +11,19 @@ if (existsSync(resolve('.env'))) {
 const ConfigSchema = z.object({
 	VERSION: z.string(),
 	PORT: z.coerce.number(),
-	AZURE_CONNECTION_STRING: z.string(),
-	S3_ACCESS_KEY_ID: z.undefined(),
-	S3_SECRET_ACCESS_KEY: z.undefined(),
-	FILE_ROOT: z.string()
+	DVR_CONTAINER_NAME: z.string(),
+	DVR_AZURE_CONNECTION_STRING: z.string(),
+	DVR_S3_ACCESS_KEY_ID: z.undefined(),
+	DVR_S3_SECRET_ACCESS_KEY: z.undefined()
 });
 
 const obj = {
 	VERSION: process.env.npm_package_version,
 	PORT: process.env.PORT ?? 3001,
-	AZURE_CONNECTION_STRING: process.env.AZURE_CONNECTION_STRING,
-	S3_ACCESS_KEY_ID: undefined,
-	S3_SECRET_ACCESS_KEY: undefined,
-	FILE_ROOT: process.env.FILE_ROOT
+	DVR_CONTAINER_NAME: process.env.DVR_CONTAINER_NAME,
+	DVR_AZURE_CONNECTION_STRING: process.env.DVR_AZURE_CONNECTION_STRING,
+	DVR_S3_ACCESS_KEY_ID: undefined,
+	DVR_S3_SECRET_ACCESS_KEY: undefined
 } satisfies Record<keyof z.infer<typeof ConfigSchema>, unknown>;
 
 export const config = ConfigSchema.parse(obj);

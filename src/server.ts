@@ -6,7 +6,7 @@ function buildServer() {
 		disableRequestLogging: !isDev,
 		logger: {
 			level: isTesting //
-				? 'warn'
+				? 'silent'
 				: isDev
 					? 'debug'
 					: 'info',
@@ -18,6 +18,27 @@ function buildServer() {
 					ignore: 'pid,hostname'
 				}
 			}
+		}
+	});
+
+	server.addSchema({
+		$id: 'DvrWebhookPayload',
+		type: 'object',
+		properties: {
+			server_id: { type: 'string' },
+			service_id: { type: 'string' },
+			action: { type: 'string' },
+			client_id: { type: 'string' },
+			ip: { type: 'string' },
+			vhost: { type: 'string' },
+			app: { type: 'string' },
+			tcUrl: { type: 'string' },
+			stream: { type: 'string' },
+			param: { type: 'string' },
+			cwd: { type: 'string' },
+			file: { type: 'string' },
+			stream_url: { type: 'string' },
+			stream_id: { type: 'string' }
 		}
 	});
 
