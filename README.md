@@ -4,6 +4,26 @@ Upload [SRS](https://ossrs.io/lts/en-us/) FLV to the DVR
 
 ## Installation
 
+```yml
+services:
+	srs:
+		...
+		environment:
+			SRS_VHOST_HTTP_HOOKS_ON_DVR: http://dvr:3001/v1/azure
+		volumes:
+			- ./data:/data
+
+	dvr:
+		image: ghcr.io/offkai/srs-dvr:main
+		restart: unless-stopped
+		environment:
+			PORT: 3001 # Optional if you need to run on another port
+			DVR_AZURE_CONNECTION_STRING: <secret>
+			DVR_CONTAINER_NAME: archive
+		volumes:
+			- ./data:/data
+```
+
 ## Contributing
 
 ### Tools
@@ -19,11 +39,11 @@ Run the following commands to bootstrap the local environment:
 
 ```sh
 cp .env.example .env
-sed -i "s/^CANDIDATE=.*/CANDIDATE=$(ifconfig eth0 | grep 'inet ' | awk '{print $2}')/" .env
+sed -i "s/^CANDIDATE=.*/CANDIDATE=\"$(ifconfig eth0 | grep 'inet ' | awk '{print $2}')\"/" .env
 docker compose -f compose.srs.yml up -d
 
 # If you want metrics (available at http://localhost:3000/)
 docker compose -f compose.grafana.yml up -d
 ```
 
-You can then run the DVR with `yarn dev` and test the webhook with `yarn stream` which will run an ffmpeg command to the SRS.
+You can then run the DVR with `yarn dev` and test the webhook with `yarn stream` in another terminal which will run an ffmpeg command to the SRS.

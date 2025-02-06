@@ -9,8 +9,9 @@ export default defineConfig({
 		},
 		coverage: {
 			provider: 'v8',
-			reporter: ['text-summary']
+			reporter: ['text']
 		},
-		pool: 'forks'
+		pool: 'forks',
+		setupFiles: []
 	}
 });
