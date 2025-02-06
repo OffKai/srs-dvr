@@ -4,24 +4,24 @@ Upload [SRS](https://ossrs.io/lts/en-us/) FLV to the DVR
 
 ## Installation
 
-```yml
+```yaml
 services:
-	srs:
-		...
-		environment:
-			SRS_VHOST_HTTP_HOOKS_ON_DVR: http://dvr:3001/v1/azure
-		volumes:
-			- ./data:/data
+  srs:
+    ...
+    environment:
+      SRS_VHOST_HTTP_HOOKS_ON_DVR: http://dvr:3001/v1/azure
+    volumes:
+      - ./data:/data
 
-	dvr:
-		image: ghcr.io/offkai/srs-dvr:main
-		restart: unless-stopped
-		environment:
-			PORT: 3001 # Optional if you need to run on another port
-			DVR_AZURE_CONNECTION_STRING: <secret>
-			DVR_CONTAINER_NAME: archive
-		volumes:
-			- ./data:/data
+  dvr:
+    image: ghcr.io/offkai/srs-dvr:main
+    restart: unless-stopped
+    environment:
+      PORT: 3001 # Optional if you need to run on another port
+      DVR_AZURE_CONNECTION_STRING: <secret>
+      DVR_CONTAINER_NAME: archive
+    volumes:
+      - ./data:/data
 ```
 
 ## Contributing
