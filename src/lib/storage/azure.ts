@@ -20,7 +20,7 @@ export const upload = async (filename: string, path: string): Promise<void> => {
 
 	const execute = async () => {
 		server.log.info(`Uploading file (${attempt}): ${path}`);
-		server.metrics?.upload.attempt.inc({ service: 'azure' });
+		server.metrics?.upload.attempt.inc({ storage: 'azure' });
 
 		try {
 			const stream = createReadStream(path);
@@ -30,7 +30,7 @@ export const upload = async (filename: string, path: string): Promise<void> => {
 
 			if (attempt >= 5) {
 				server.log.error(`Failed to upload file after 5 attempts: ${path}`);
-				server.metrics?.upload.failure.inc({ service: 'azure' });
+				server.metrics?.upload.failure.inc({ storage: 'azure' });
 				return;
 			}
 
@@ -53,7 +53,7 @@ export const upload = async (filename: string, path: string): Promise<void> => {
 		}
 
 		server.log.info(`File uploaded (${attempt}): ${path}'`);
-		server.metrics?.upload.success.inc({ service: 'azure' });
+		server.metrics?.upload.success.inc({ storage: 'azure' });
 	};
 
 	await execute();

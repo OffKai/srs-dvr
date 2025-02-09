@@ -20,7 +20,7 @@ services:
       PORT: 3001 # Optional, if you need to run on another port
       DVR_AZURE_CONNECTION_STRING: <secret>
       DVR_CONTAINER_NAME: "archive"
-	  DVR_PATH_ROOT: "/data" # Must match the `dvr_path` root in the SRS config
+      DVR_PATH_ROOT: "/data" # Must match the `dvr_path` root in the SRS config
     volumes:
       - ./data:/data
 ```
@@ -41,7 +41,7 @@ Run the following commands to bootstrap the local environment:
 ```sh
 cp .env.example .env
 
-# for macOS
+# for MacOS
 sed -i "" "s/^CANDIDATE=.*/CANDIDATE=\"$(ifconfig en0 inet | grep 'inet ' | awk '{print $2}')\"/" .env
 # for Linux
 sed -i "s/^CANDIDATE=.*/CANDIDATE=\"$(ifconfig eth0 | grep 'inet ' | awk '{print $2}')\"/" .env

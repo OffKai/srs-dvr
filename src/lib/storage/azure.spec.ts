@@ -1,5 +1,5 @@
 import { server } from '../../server.js';
-import { routes } from '../../routes.js';
+import { azureRoutes } from './azure.routes.js';
 import type { DvrWebhookPayload } from '../types/srs.js';
 import type { BlockBlobClient } from '@azure/storage-blob';
 
@@ -41,7 +41,7 @@ vi.mock('@azure/storage-blob', () => {
 
 describe('Azure route testing', () => {
 	beforeAll(async () => {
-		await server.register(routes);
+		await server.register(azureRoutes);
 	});
 
 	afterEach(() => {
@@ -148,7 +148,7 @@ describe('Azure route testing', () => {
 	});
 
 	describe('validation', () => {
-		it('should fail with invald body', async () => {
+		it('should fail with invalid body', async () => {
 			const testBody = {
 				key: 'value'
 			};
@@ -163,7 +163,7 @@ describe('Azure route testing', () => {
 			expect(response.json()).toStrictEqual({ code: 1 });
 		});
 
-		it('should fail with invald file path', async () => {
+		it('should fail with invalid file path', async () => {
 			const testBody: DvrWebhookPayload = {
 				action: '',
 				client_id: '',

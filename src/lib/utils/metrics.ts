@@ -7,17 +7,17 @@ export class DvrMetrics {
 		attempt: new promClient.Counter({
 			name: 'dvr_upload_attempts',
 			help: 'The count of upload attempts',
-			labelNames: ['service']
+			labelNames: ['storage']
 		}),
 		success: new promClient.Counter({
 			name: 'dvr_upload_successes',
 			help: 'The count of upload successes',
-			labelNames: ['service']
+			labelNames: ['storage']
 		}),
 		failure: new promClient.Counter({
 			name: 'dvr_upload_failures',
 			help: 'The count of upload failures',
-			labelNames: ['service']
+			labelNames: ['storage']
 		})
 	};
 
