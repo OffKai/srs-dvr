@@ -1,5 +1,8 @@
 import Fastify from 'fastify';
-import { isDev, isTesting } from './lib/constants.js';
+import { isDev, isTesting } from './lib/utils/constants.js';
+import { DvrMetrics } from './lib/utils/metrics.js';
+import { config } from './lib/utils/config.js';
+import type { DvrWebhookPayload } from './lib/types/srs.js';
 
 function buildServer() {
 	const server = Fastify({
@@ -21,9 +24,17 @@ function buildServer() {
 		}
 	});
 
+	if (config.DVR_METRICS) {
+		server.decorate('metrics', new DvrMetrics());
+	}
+
 	server.addSchema({
 		$id: 'DvrWebhookPayload',
 		type: 'object',
+		additionalProperties: false,
+		required: [
+			'file' //
+		],
 		properties: {
 			server_id: { type: 'string' },
 			service_id: { type: 'string' },
@@ -39,7 +50,7 @@ function buildServer() {
 			file: { type: 'string' },
 			stream_url: { type: 'string' },
 			stream_id: { type: 'string' }
-		}
+		} satisfies Record<keyof DvrWebhookPayload, unknown>
 	});
 
 	return server;

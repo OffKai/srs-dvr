@@ -12,6 +12,7 @@ export default defineConfig({
 			reporter: ['text']
 		},
 		pool: 'forks',
-		setupFiles: []
+		setupFiles: [],
+		unstubEnvs: true
 	}
 });

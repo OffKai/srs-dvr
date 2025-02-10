@@ -1,8 +1,9 @@
 import { resolve } from 'node:path';
-import { isDev } from './constants.js';
+import { isDev, isTesting } from './constants.js';
+import { config } from './config.js';
 
 export function getFilePath(path: string): string {
-	if (isDev) {
+	if (isDev && !isTesting) {
 		// Resolves /data to ./data for local use
 		return resolve(`.${path}`);
 	}
@@ -14,9 +15,5 @@ export function getFilePath(path: string): string {
  * Verify that the path uses the proper root
  */
 export function verifyFilePath(path: string): boolean {
-	if (isDev) {
-		return true;
-	}
-
-	return path.startsWith('/data');
+	return path.startsWith(config.DVR_PATH_ROOT);
 }

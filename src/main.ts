@@ -1,5 +1,5 @@
-import { config } from './lib/config.js';
-import { isDev } from './lib/constants.js';
+import { config } from './lib/utils/config.js';
+import { isDev } from './lib/utils/constants.js';
 import { routes } from './routes.js';
 import { server } from './server.js';
 
@@ -14,6 +14,7 @@ const start = async (): Promise<void> => {
 
 		server.log.info(`Environment: ${process.env.NODE_ENV}`);
 		server.log.info(`Version:     ${config.VERSION}`);
+		server.log.info(`Metrics:     ${config.DVR_METRICS ? 'enabled' : 'disabled'}`);
 	} catch (err: unknown) {
 		server.log.error(err);
 		process.exit(1);

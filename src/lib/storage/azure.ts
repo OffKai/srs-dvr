@@ -2,11 +2,12 @@ import { BlobServiceClient } from '@azure/storage-blob';
 import { rm } from 'node:fs/promises';
 import { createReadStream } from 'node:fs';
 import { setTimeout } from 'node:timers';
-import { server } from '../server.js';
+import { server } from '../../server.js';
+import { config } from '../utils/config.js';
 
-const blobClient = BlobServiceClient.fromConnectionString(process.env.AZURE_CONNECTION_STRING!);
+const blobClient = BlobServiceClient.fromConnectionString(config.DVR_AZURE_CONNECTION_STRING);
 
-const azureClient = blobClient.getContainerClient(process.env.DVR_CONTAINER_NAME!);
+const azureClient = blobClient.getContainerClient(config.DVR_CONTAINER_NAME);
 
 /**
  * Upload a file to Azure Blob Storage
@@ -16,18 +17,20 @@ const azureClient = blobClient.getContainerClient(process.env.DVR_CONTAINER_NAME
 export const upload = async (filename: string, path: string): Promise<void> => {
 	let attempt = 1;
 	const blockClient = azureClient.getBlockBlobClient(filename);
-	const stream = createReadStream(path);
 
 	const execute = async () => {
 		server.log.info(`Uploading file (${attempt}): ${path}`);
+		server.metrics?.upload.attempt.inc({ storage: 'azure' });
 
 		try {
+			const stream = createReadStream(path);
 			await blockClient.uploadStream(stream);
 		} catch (err: unknown) {
 			server.log.error(err, `Failed to upload file (${attempt})`);
 
 			if (attempt >= 5) {
 				server.log.error(`Failed to upload file after 5 attempts: ${path}`);
+				server.metrics?.upload.failure.inc({ storage: 'azure' });
 				return;
 			}
 
@@ -50,6 +53,7 @@ export const upload = async (filename: string, path: string): Promise<void> => {
 		}
 
 		server.log.info(`File uploaded (${attempt}): ${path}'`);
+		server.metrics?.upload.success.inc({ storage: 'azure' });
 	};
 
 	await execute();
