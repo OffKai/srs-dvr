@@ -28,6 +28,4 @@ export const azureRoutes: FastifyPluginAsync = async (server) => {
 			await upload(filename, path);
 		}
 	);
-
-	server.log.info('Routes loaded');
 };
