@@ -6,7 +6,6 @@
 	},
 	"include": [
 		"src", //
-		"tests",
 		".prettierrc.cjs",
 		"eslint.config.js",
 		"tsup.config.ts",

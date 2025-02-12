@@ -12,9 +12,10 @@ if (existsSync(resolve('.env'))) {
 const ConfigSchema = z.object({
 	VERSION: z.string(),
 	PORT: z.coerce.number(),
+	METRICS_PORT: z.coerce.number(),
 	DVR_CONTAINER_NAME: z.string(),
 	DVR_PATH_ROOT: z.string(),
-	DVR_METRICS: z
+	DVR_METRICS_ENABLED: z
 		.enum(['true', 'false'])
 		.transform((value) => value === 'true')
 		.default('false'),
@@ -27,6 +28,7 @@ function loadConfig(): z.infer<typeof ConfigSchema> {
 	const obj = {
 		VERSION: process.env.npm_package_version,
 		PORT: process.env.PORT ?? 3001,
+		METRICS_PORT: process.env.METRICS_PORT ?? 3002,
 		DVR_CONTAINER_NAME: isTesting //
 			? 'test'
 			: process.env.DVR_CONTAINER_NAME,
@@ -36,7 +38,7 @@ function loadConfig(): z.infer<typeof ConfigSchema> {
 		DVR_AZURE_CONNECTION_STRING: isTesting //
 			? ''
 			: process.env.DVR_AZURE_CONNECTION_STRING,
-		DVR_METRICS: process.env.DVR_METRICS,
+		DVR_METRICS_ENABLED: process.env.DVR_METRICS_ENABLED,
 		DVR_S3_ACCESS_KEY_ID: undefined,
 		DVR_S3_SECRET_ACCESS_KEY: undefined
 	} satisfies Record<keyof z.infer<typeof ConfigSchema>, unknown>;

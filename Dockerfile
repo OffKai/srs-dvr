@@ -35,6 +35,6 @@ COPY --from=builder --chown=dvr:dvr /temp/package.json ./
 
 USER dvr:dvr
 
-EXPOSE 3001
+EXPOSE 3001 3002
 
 CMD ["node", "--enable-source-maps", "dist/main.js"]

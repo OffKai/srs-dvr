@@ -3,12 +3,13 @@ import { basename } from 'node:path';
 import { upload } from './azure.js';
 import type { DvrWebhookPayload } from '../types/srs.js';
 import { getFilePath, verifyFilePath } from '../utils/fs.js';
+import { DvrWebhookSchema } from '../utils/constants.js';
 
 export const azureRoutes: FastifyPluginAsync = async (server) => {
 	server.post<{ Body: DvrWebhookPayload }>(
 		'/v1/azure', //
 		{
-			schema: { body: { $ref: 'DvrWebhookPayload' } },
+			schema: { body: { $ref: DvrWebhookSchema.$id } },
 			attachValidation: true
 		},
 		async (req, res) => {
