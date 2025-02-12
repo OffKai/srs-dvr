@@ -18,15 +18,15 @@ services:
     restart: unless-stopped
     environment:
       PORT: 3001 # Optional, if you need to run on another port
-	  METRICS_PORT: 3002 # Same as above but for metrics
+      METRICS_PORT: 3002 # Same as above but for metrics
       DVR_AZURE_CONNECTION_STRING: <secret>
       DVR_CONTAINER_NAME: "archive"
       DVR_PATH_ROOT: "/data" # Must match the `dvr_path` root in the SRS config
     volumes:
       - ./data:/data
-	ports:
-		- 127.0.0.1:3001:3001/tcp # API server
-		- 127.0.0.1:3002:3002/tcp # Prometheus metrics
+    ports:
+        - 127.0.0.1:3001:3001/tcp # API server
+        - 127.0.0.1:3002:3002/tcp # Prometheus metrics
 ```
 
 ## Contributing
