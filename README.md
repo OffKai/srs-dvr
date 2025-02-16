@@ -24,6 +24,7 @@ services:
       DVR_PATH_ROOT: "/data" # Must match the `dvr_path` root in the SRS config
     volumes:
       - ./data:/data
+      - ./dvr:/dvr
     ports:
         - 127.0.0.1:3001:3001/tcp # API server
         - 127.0.0.1:3002:3002/tcp # Prometheus metrics
@@ -56,4 +57,4 @@ docker compose -f compose.srs.yml up -d
 docker compose -f compose.grafana.yml up -d
 ```
 
-You can then run the DVR with `yarn dev` and test the webhook with `yarn stream` in another terminal which will run an ffmpeg command to the SRS.
+You can then run the DVR with `yarn dev` and test the webhook with `yarn stream sd inf` in another terminal which will run an ffmpeg command to the SRS. You can check the scripts dir for more info.

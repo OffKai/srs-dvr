@@ -1,6 +1,9 @@
 import { resolve } from 'node:path';
 import { isDev, isTesting } from './constants.js';
-import { config } from './config.js';
+import { existsSync } from 'node:fs';
+import { readFile, writeFile } from 'node:fs/promises';
+import { server } from '../../server.js';
+import type { TrackerVideo } from '../types/srs.js';
 
 export function getFilePath(path: string): string {
 	if (isDev && !isTesting) {
@@ -11,9 +14,61 @@ export function getFilePath(path: string): string {
 	return path;
 }
 
-/**
- * Verify that the path uses the proper root
- */
-export function verifyFilePath(path: string): boolean {
-	return path.startsWith(config.DVR_PATH_ROOT);
+export function fmtUploadPath(data: { app: string; stream: string; filename: string }): string {
+	return `${data.app}/${data.stream}/${data.filename}`;
 }
+
+export function verifyFilePath(path: string): boolean {
+	if (isDev && !isTesting) {
+		return true;
+	}
+
+	if (!path.startsWith(server.config.DVR_PATH_ROOT)) {
+		return false;
+	}
+
+	if (!path.endsWith('.flv')) {
+		return false;
+	}
+
+	return existsSync(path);
+}
+
+type JsonData = { videos: Array<TrackerVideo> };
+
+export const tracker = {
+	path: resolve('videos.json'),
+	init: async function (): Promise<void> {
+		if (!existsSync(this.path)) {
+			await writeFile(this.path, JSON.stringify({ videos: [] } satisfies JsonData));
+		}
+	},
+	add: async function (video: TrackerVideo): Promise<void> {
+		const videos = await tracker.read();
+		videos.push(video);
+
+		await writeFile(this.path, JSON.stringify({ videos } satisfies JsonData), 'utf-8');
+	},
+	read: async function (): Promise<Array<TrackerVideo>> {
+		const file = await readFile(this.path, 'utf-8');
+		const json: JsonData = JSON.parse(file);
+
+		return json.videos;
+	},
+	remove: async function (path: string): Promise<void> {
+		const videos = await tracker.read();
+
+		await writeFile(
+			this.path,
+			JSON.stringify({
+				videos: videos.filter((video) => video.path !== path)
+			} satisfies JsonData),
+			'utf-8'
+		);
+	},
+	has: async function (path: string): Promise<boolean> {
+		const videos = await tracker.read();
+
+		return videos.some((video) => video.path === path);
+	}
+};

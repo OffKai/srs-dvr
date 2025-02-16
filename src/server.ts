@@ -1,10 +1,10 @@
-import Fastify from 'fastify';
+import { fastify } from 'fastify';
 import { DvrWebhookSchema, isDev, isTesting } from './lib/utils/constants.js';
 import { DvrMetrics } from './lib/utils/metrics.js';
-import { config } from './lib/utils/config.js';
+import { loadConfig } from './lib/utils/config.js';
 
 function buildServer() {
-	const server = Fastify({
+	const server = fastify({
 		disableRequestLogging: !isDev,
 		logger: {
 			level: isTesting //
@@ -23,7 +23,10 @@ function buildServer() {
 		}
 	});
 
-	if (config.DVR_METRICS_ENABLED) {
+	const cfg = loadConfig();
+	server.decorate('config', cfg);
+
+	if (cfg.DVR_METRICS_ENABLED) {
 		server.decorate('metrics', new DvrMetrics());
 	}
 

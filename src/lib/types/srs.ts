@@ -14,3 +14,12 @@ export type DvrWebhookPayload = {
 	stream_url: string;
 	stream_id: string;
 };
+
+export type TrackerVideo = {
+	app: string;
+	stream: string;
+	filename: string;
+	path: string;
+	storage: 'azure';
+	date: string;
+};

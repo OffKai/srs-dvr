@@ -4,5 +4,6 @@ dist/
 node_modules/
 .env*
 !.env.example
+videos.json
 package-lock.json
 pnpm-lock.yaml
