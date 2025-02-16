@@ -62,7 +62,7 @@ describe('Azure routes', () => {
 	});
 
 	describe('logic', () => {
-		const file = '/data/video.flv';
+		const file = '/data/app_id/stream_id/video.flv';
 		const body = MockBody({ file });
 
 		it('should upload file', async () => {
