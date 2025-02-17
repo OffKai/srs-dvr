@@ -19,14 +19,14 @@ const start = async (): Promise<void> => {
 			port: server.config.METRICS_PORT
 		});
 
-		await restartUploads();
-
 		server.log.info('API');
 		server.log.info(`  Environment: ${process.env.NODE_ENV}`);
 		server.log.info(`  Version:     ${server.config.VERSION}`);
 		server.log.info('Metrics');
 		server.log.info(`  Status:      ${server.config.DVR_METRICS_ENABLED ? 'enabled' : 'disabled'}`);
 		server.log.info(`  Endpoint:    http://${host}:${server.config.METRICS_PORT}/metrics`);
+
+		await restartUploads();
 	} catch (err: unknown) {
 		server.log.error(err);
 

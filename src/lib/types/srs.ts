@@ -1,3 +1,11 @@
+export type UploadFunc = (
+	uploadPath: string,
+	filePath: string,
+	options?: {
+		onComplete: () => void | Promise<void>;
+	}
+) => Promise<void>;
+
 export type DvrWebhookPayload = {
 	server_id: string;
 	service_id: string;
@@ -15,11 +23,13 @@ export type DvrWebhookPayload = {
 	stream_id: string;
 };
 
+export type StorageTypes = 'azure';
+
 export type TrackerVideo = {
 	app: string;
 	stream: string;
 	filename: string;
 	path: string;
-	storage: 'azure';
+	storage: StorageTypes;
 	date: string;
 };

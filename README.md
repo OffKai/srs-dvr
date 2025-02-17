@@ -19,9 +19,14 @@ services:
     environment:
       PORT: 3001 # Optional, if you need to run on another port
       METRICS_PORT: 3002 # Same as above but for metrics
+      # Must match the `dvr_path` root in the SRS config
+      # Examples:
+      #     /data/[app]/[stream]/[timestamp].flv;       -> "/data"
+      #     /other/path/[app]/[stream]/[timestamp].flv; -> "/other/path"
+      DVR_DATA_ROOT: "/data"
+      DVR_DEFAULT_STORAGE: "azure"
       DVR_AZURE_CONNECTION_STRING: <secret>
-      DVR_CONTAINER_NAME: "archive"
-      DVR_PATH_ROOT: "/data" # Must match the `dvr_path` root in the SRS config
+      DVR_AZURE_CONTAINER_NAME: "dvr"
     volumes:
       - ./data:/data
       - ./dvr:/dvr

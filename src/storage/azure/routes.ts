@@ -20,12 +20,12 @@ export const azureRoutes: FastifyPluginAsync = async (server) => {
 			const path = getFilePath(req.body.file);
 			const isValid = verifyFilePath(path);
 			if (!isValid) {
-				server.log.error(`Invalid file path: ${path}`);
+				server.log.error(`invalid file path: ${path}`);
 				return await res.status(400).send({ code: 1 });
 			}
 
 			if (await tracker.has(path)) {
-				server.log.error(`File already being uploaded: ${path}`);
+				server.log.error(`file already being uploaded: ${path}`);
 				return await res.status(400).send({ code: 1 });
 			}
 

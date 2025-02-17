@@ -1,27 +1,59 @@
+import { readdir } from 'node:fs/promises';
 import { azureUpload } from '../../storage/azure/upload.js';
-import { fmtUploadPath, tracker } from './fs.js';
-
-// TODO - SRS doesn't implement webhook retries
-// Considerations:
-// - DVR is down at stream start
-// - Tracker file is empty on restart and stream is over
+import { fmtUploadPath, getFilePath, tracker } from './fs.js';
+import { server } from '../../server.js';
+import { join } from 'node:path';
 
 export async function restartUploads(): Promise<void> {
-	const videos = await tracker.read();
+	server.log.info('restarting uploads');
 
-	for (const video of videos) {
-		if (video.storage === 'azure') {
-			const uploadPath = fmtUploadPath({
-				app: video.app,
-				stream: video.stream,
-				filename: video.filename
-			});
+	let count = 0;
+	let total = 0;
 
-			void azureUpload(uploadPath, video.path, {
-				onComplete: async () => {
-					await tracker.remove(video.path);
+	const root = getFilePath(server.config.DVR_DATA_ROOT);
+	for (const app of await readdir(root)) {
+		const appPath = join(root, app);
+
+		for (const stream of await readdir(appPath)) {
+			const streamPath = join(appPath, stream);
+
+			for (const file of await readdir(streamPath)) {
+				const path = join(streamPath, file);
+
+				if (!file.endsWith('.flv')) continue;
+
+				total += 1;
+
+				if (server.config.DVR_DEFAULT_STORAGE === 'azure') {
+					// Move this above when/if more storage options are added
+					await tracker.add(
+						{
+							app,
+							stream,
+							filename: file,
+							path,
+							storage: 'azure',
+							date: new Date().toISOString()
+						},
+						{ checkExisting: true }
+					);
+
+					const uploadPath = fmtUploadPath({
+						app,
+						stream,
+						filename: file
+					});
+
+					await azureUpload(uploadPath, path, {
+						onComplete: async () => {
+							count += 1;
+							await tracker.remove(path);
+						}
+					});
 				}
-			});
+			}
 		}
 	}
+
+	server.log.info(`uploaded ${count}/${total} files`);
 }

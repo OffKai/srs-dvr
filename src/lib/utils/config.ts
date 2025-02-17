@@ -3,6 +3,7 @@ import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { loadEnvFile } from 'node:process';
 import { isTesting } from './constants.js';
+import type { StorageTypes } from '../types/srs.js';
 
 // Load .env file if it exists
 if (existsSync(resolve('.env'))) {
@@ -13,15 +14,14 @@ export const ConfigSchema = z.object({
 	VERSION: z.string(),
 	PORT: z.coerce.number().default(3001),
 	METRICS_PORT: z.coerce.number().default(3002),
-	DVR_CONTAINER_NAME: z.string(),
-	DVR_PATH_ROOT: z.string(),
 	DVR_METRICS_ENABLED: z
 		.enum(['true', 'false'])
 		.transform((value) => value === 'true')
 		.default('true'),
+	DVR_DATA_ROOT: z.string(),
+	DVR_DEFAULT_STORAGE: z.enum<StorageTypes, [StorageTypes, ...StorageTypes[]]>(['azure']),
 	DVR_AZURE_CONNECTION_STRING: z.string(),
-	DVR_S3_ACCESS_KEY_ID: z.undefined(),
-	DVR_S3_SECRET_ACCESS_KEY: z.undefined()
+	DVR_AZURE_CONTAINER_NAME: z.string()
 });
 
 export function loadConfig(): z.infer<typeof ConfigSchema> {
@@ -29,12 +29,11 @@ export function loadConfig(): z.infer<typeof ConfigSchema> {
 		VERSION: process.env.npm_package_version,
 		PORT: process.env.PORT,
 		METRICS_PORT: process.env.METRICS_PORT,
-		DVR_CONTAINER_NAME: process.env.DVR_CONTAINER_NAME,
-		DVR_PATH_ROOT: process.env.DVR_PATH_ROOT,
-		DVR_AZURE_CONNECTION_STRING: process.env.DVR_AZURE_CONNECTION_STRING,
 		DVR_METRICS_ENABLED: process.env.DVR_METRICS_ENABLED,
-		DVR_S3_ACCESS_KEY_ID: undefined,
-		DVR_S3_SECRET_ACCESS_KEY: undefined
+		DVR_DATA_ROOT: process.env.DVR_DATA_ROOT,
+		DVR_DEFAULT_STORAGE: process.env.DVR_DEFAULT_STORAGE,
+		DVR_AZURE_CONNECTION_STRING: process.env.DVR_AZURE_CONNECTION_STRING,
+		DVR_AZURE_CONTAINER_NAME: process.env.DVR_AZURE_CONTAINER_NAME
 	};
 
 	if (isTesting) {
@@ -42,12 +41,11 @@ export function loadConfig(): z.infer<typeof ConfigSchema> {
 			VERSION: process.env.npm_package_version,
 			PORT: 3001,
 			METRICS_PORT: 3002,
-			DVR_CONTAINER_NAME: 'test',
-			DVR_PATH_ROOT: '/data',
-			DVR_AZURE_CONNECTION_STRING: '',
 			DVR_METRICS_ENABLED: 'true',
-			DVR_S3_ACCESS_KEY_ID: undefined,
-			DVR_S3_SECRET_ACCESS_KEY: undefined
+			DVR_DATA_ROOT: '/data',
+			DVR_DEFAULT_STORAGE: 'azure',
+			DVR_AZURE_CONNECTION_STRING: '',
+			DVR_AZURE_CONTAINER_NAME: 'test'
 		};
 	}
 

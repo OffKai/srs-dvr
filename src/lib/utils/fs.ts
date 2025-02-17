@@ -23,7 +23,7 @@ export function verifyFilePath(path: string): boolean {
 		return true;
 	}
 
-	if (!path.startsWith(server.config.DVR_PATH_ROOT)) {
+	if (!path.startsWith(server.config.DVR_DATA_ROOT)) {
 		return false;
 	}
 
@@ -43,8 +43,13 @@ export const tracker = {
 			await writeFile(this.path, JSON.stringify({ videos: [] } satisfies JsonData));
 		}
 	},
-	add: async function (video: TrackerVideo): Promise<void> {
+	add: async function (video: TrackerVideo, options?: { checkExisting: boolean }): Promise<void> {
 		const videos = await tracker.read();
+
+		if (options?.checkExisting && videos.some((v) => v.path === video.path)) {
+			return;
+		}
+
 		videos.push(video);
 
 		await writeFile(this.path, JSON.stringify({ videos } satisfies JsonData), 'utf-8');
