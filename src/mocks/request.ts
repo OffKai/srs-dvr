@@ -1,15 +1,12 @@
 import type { DvrWebhookPayload } from '../lib/types/srs.js';
 
-export const MockBody = (data: Partial<DvrWebhookPayload>): DvrWebhookPayload => ({
+export const MockBody = (data: Partial<DvrWebhookPayload> & Pick<DvrWebhookPayload, 'app' | 'stream' | 'file'>): DvrWebhookPayload => ({
 	action: '',
 	client_id: '',
 	ip: '',
 	vhost: '',
-	app: '',
-	stream: '',
 	param: '',
 	cwd: '',
-	file: '',
 	server_id: '',
 	stream_url: '',
 	stream_id: '',

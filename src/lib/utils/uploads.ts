@@ -1,6 +1,6 @@
 import { readdir } from 'node:fs/promises';
 import { azureUpload } from '../../storage/azure/upload.js';
-import { fmtUploadPath, getFilePath, tracker } from './fs.js';
+import { fmtUploadPath, getFilePath } from './fs.js';
 import { server } from '../../server.js';
 import { join } from 'node:path';
 
@@ -26,17 +26,14 @@ export async function restartUploads(): Promise<void> {
 
 				if (server.config.DVR_DEFAULT_STORAGE === 'azure') {
 					// Move this above when/if more storage options are added
-					await tracker.add(
-						{
-							app,
-							stream,
-							filename: file,
-							path,
-							storage: 'azure',
-							date: new Date().toISOString()
-						},
-						{ checkExisting: true }
-					);
+					server.tracker.set(path, {
+						app,
+						stream,
+						filename: file,
+						path,
+						storage: 'azure',
+						date: new Date().toISOString()
+					});
 
 					const uploadPath = fmtUploadPath({
 						app,
@@ -45,9 +42,12 @@ export async function restartUploads(): Promise<void> {
 					});
 
 					await azureUpload(uploadPath, path, {
-						onComplete: async () => {
+						onComplete: () => {
 							count += 1;
-							await tracker.remove(path);
+							server.tracker.delete(path);
+						},
+						onAbort: () => {
+							server.tracker.delete(path);
 						}
 					});
 				}
@@ -55,5 +55,9 @@ export async function restartUploads(): Promise<void> {
 		}
 	}
 
-	server.log.info(`uploaded ${count}/${total} files`);
+	if (total === 0) {
+		server.log.info('no files to upload');
+	} else {
+		server.log.info(`uploaded ${count}/${total} files`);
+	}
 }

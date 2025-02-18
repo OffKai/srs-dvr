@@ -1,12 +1,10 @@
 import { isDev } from './lib/utils/constants.js';
-import { tracker } from './lib/utils/fs.js';
 import { restartUploads } from './lib/utils/uploads.js';
 import { routes } from './routes.js';
 import { server } from './server.js';
 
 const start = async (): Promise<void> => {
 	try {
-		await tracker.init();
 		await server.register(routes);
 
 		const host = isDev ? '127.0.0.1' : '0.0.0.0';

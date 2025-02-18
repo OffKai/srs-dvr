@@ -1,7 +1,6 @@
 import { register, Counter } from 'prom-client';
 import { type FastifyInstance, fastify } from 'fastify';
 import { server } from '../../server.js';
-import { tracker } from './fs.js';
 import { isDev } from './constants.js';
 
 export class DvrMetrics {
@@ -55,7 +54,7 @@ export class DvrMetrics {
 		});
 
 		this.#server.get('/status', async (_, res) => {
-			const videos = await tracker.read();
+			const videos = server.tracker.values().toArray();
 
 			const payload: string[] = videos
 				.sort((a, b) => b.date.localeCompare(a.date))

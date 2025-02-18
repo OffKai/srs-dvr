@@ -2,7 +2,8 @@ export type UploadFunc = (
 	uploadPath: string,
 	filePath: string,
 	options?: {
-		onComplete: () => void | Promise<void>;
+		onComplete?: () => void | Promise<void>;
+		onAbort?: () => void | Promise<void>;
 	}
 ) => Promise<void>;
 

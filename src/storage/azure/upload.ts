@@ -20,7 +20,7 @@ export const azureUpload: UploadFunc = async (uploadPath, filePath, options) => 
 	let attempt = 1;
 	const blockClient = azureClient.getBlockBlobClient(uploadPath);
 
-	const execute = async () => {
+	const execute = async (): Promise<void> => {
 		server.log.info(`uploading file (${attempt}): ${filePath}`);
 		server.metrics?.upload.attempt.inc({ storage: 'azure' });
 
@@ -38,8 +38,8 @@ export const azureUpload: UploadFunc = async (uploadPath, filePath, options) => 
 				server.log.error(`failed to upload file after ${MAX_RETRIES} attempts: ${filePath}`);
 				server.metrics?.upload.failure.inc({ storage: 'azure' });
 
-				if (options?.onComplete) {
-					await options.onComplete();
+				if (options?.onAbort) {
+					await options.onAbort();
 				}
 
 				return;

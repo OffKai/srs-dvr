@@ -1,8 +1,8 @@
 import { azureUpload } from './upload.js';
-import { getFilePath, fmtUploadPath, tracker, verifyFilePath } from '../../lib/utils/fs.js';
+import { getFilePath, fmtUploadPath, verifyFilePath } from '../../lib/utils/fs.js';
 import { DvrWebhookSchema } from '../../lib/utils/constants.js';
 import type { FastifyPluginAsync } from 'fastify';
-import type { DvrWebhookPayload } from '../../lib/types/srs.js';
+import type { DvrWebhookPayload, TrackerVideo } from '../../lib/types/srs.js';
 import { basename } from 'node:path';
 
 export const azureRoutes: FastifyPluginAsync = async (server) => {
@@ -24,30 +24,35 @@ export const azureRoutes: FastifyPluginAsync = async (server) => {
 				return await res.status(400).send({ code: 1 });
 			}
 
-			if (await tracker.has(path)) {
+			if (server.tracker.has(path)) {
 				server.log.error(`file already being uploaded: ${path}`);
 				return await res.status(400).send({ code: 1 });
 			}
 
-			await tracker.add({
+			const video: TrackerVideo = {
 				app: req.body.app,
 				stream: req.body.stream,
 				filename: basename(path),
 				path,
 				storage: 'azure',
 				date: new Date().toISOString()
-			});
+			};
+
+			server.tracker.set(path, video);
 
 			await res.status(200).send({ code: 0 });
 
 			const uploadPath = fmtUploadPath({
-				app: req.body.app,
-				stream: req.body.stream,
-				filename: basename(path)
+				app: video.app,
+				stream: video.stream,
+				filename: video.filename
 			});
 			await azureUpload(uploadPath, path, {
-				onComplete: async () => {
-					await tracker.remove(path);
+				onComplete: () => {
+					server.tracker.delete(path);
+				},
+				onAbort: () => {
+					server.tracker.delete(path);
 				}
 			});
 		}

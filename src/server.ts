@@ -25,6 +25,7 @@ function buildServer() {
 
 	const cfg = loadConfig();
 	server.decorate('config', cfg);
+	server.decorate('tracker', new Map());
 
 	if (cfg.DVR_METRICS_ENABLED) {
 		server.decorate('metrics', new DvrMetrics());
