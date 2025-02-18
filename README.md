@@ -1,6 +1,6 @@
 # Simple Realtime Server Digital Video Recorder
 
-Upload [SRS](https://ossrs.io/lts/en-us/) FLV to the DVR
+Upload [SRS](https://ossrs.io/lts/en-us/) recordings to the cloud
 
 ## Installation
 
