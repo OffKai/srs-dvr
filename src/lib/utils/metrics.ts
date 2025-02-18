@@ -1,7 +1,6 @@
 import { register, Counter } from 'prom-client';
 import { type FastifyInstance, fastify } from 'fastify';
 import { server } from '../../server.js';
-import { isDev } from './constants.js';
 
 export class DvrMetrics {
 	readonly #server: FastifyInstance;
@@ -28,15 +27,7 @@ export class DvrMetrics {
 		this.#server = fastify({
 			disableRequestLogging: true,
 			logger: {
-				level: 'info',
-				transport: {
-					target: 'pino-pretty',
-					options: {
-						colorize: isDev,
-						translateTime: 'HH:MM:ss Z',
-						ignore: 'pid,hostname'
-					}
-				}
+				level: 'silent'
 			}
 		});
 
