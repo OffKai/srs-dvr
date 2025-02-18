@@ -29,7 +29,6 @@ services:
       DVR_AZURE_CONTAINER_NAME: "dvr"
     volumes:
       - ./data:/data
-      - ./dvr:/dvr
     ports:
         - 127.0.0.1:3001:3001/tcp # API server
         - 127.0.0.1:3002:3002/tcp # Prometheus metrics
