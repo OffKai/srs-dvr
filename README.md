@@ -14,7 +14,7 @@ services:
       - ./data:/data
 
   dvr:
-    image: ghcr.io/offkai/srs-dvr:main
+    image: ghcr.io/offkai/srs-dvr:latest
     restart: unless-stopped
     environment:
       PORT: 3001 # Optional, if you need to run on another port
