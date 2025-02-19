@@ -1,5 +1,5 @@
 ## Base ##
-FROM node:22.13.1-alpine3.21 AS base
+FROM node:22.14.0-alpine3.21 AS base
 
 RUN apk update --no-cache
 
@@ -24,16 +24,11 @@ LABEL org.opencontainers.image.licenses=Apache-2.0
 
 ENV NODE_ENV=production
 
-RUN adduser --system --uid 1001 dvr && \
-	addgroup --system --gid 1001 dvr
+WORKDIR /dvr
 
-WORKDIR /srs-dvr
-
-COPY --from=builder --chown=dvr:dvr /temp/node_modules node_modules/
-COPY --from=builder --chown=dvr:dvr /temp/dist dist/
-COPY --from=builder --chown=dvr:dvr /temp/package.json ./
-
-USER dvr:dvr
+COPY --from=builder /temp/node_modules node_modules/
+COPY --from=builder /temp/dist dist/
+COPY --from=builder /temp/package.json ./
 
 EXPOSE 3001 3002
 

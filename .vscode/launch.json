@@ -1,0 +1,17 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Debug",
+			"type": "node",
+			"request": "launch",
+			"cwd": "${workspaceRoot}",
+			"program": "${workspaceFolder}/dist/main.js",
+			"args": [],
+			"skipFiles": ["<node_internals>/**"],
+			"sourceMaps": true,
+			"stopOnEntry": false,
+			"runtimeExecutable": null
+		}
+	]
+}

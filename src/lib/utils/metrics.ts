@@ -1,22 +1,22 @@
-import promClient from 'prom-client';
-import Fastify, { type FastifyInstance } from 'fastify';
-import { config } from './config.js';
+import { register, Counter } from 'prom-client';
+import { type FastifyInstance, fastify } from 'fastify';
+import { server } from '../../server.js';
 
 export class DvrMetrics {
 	readonly #server: FastifyInstance;
 
 	public readonly upload = {
-		attempt: new promClient.Counter({
+		attempt: new Counter({
 			name: 'dvr_upload_attempts',
 			help: 'The count of upload attempts',
 			labelNames: ['storage']
 		}),
-		success: new promClient.Counter({
+		success: new Counter({
 			name: 'dvr_upload_successes',
 			help: 'The count of upload successes',
 			labelNames: ['storage']
 		}),
-		failure: new promClient.Counter({
+		failure: new Counter({
 			name: 'dvr_upload_failures',
 			help: 'The count of upload failures',
 			labelNames: ['storage']
@@ -24,14 +24,15 @@ export class DvrMetrics {
 	};
 
 	public constructor() {
-		this.#server = Fastify({
+		this.#server = fastify({
+			disableRequestLogging: true,
 			logger: {
 				level: 'silent'
 			}
 		});
 
 		this.#server.get('/metrics', async (_, res) => {
-			if (!config.DVR_METRICS_ENABLED) {
+			if (!server.config.DVR_METRICS_ENABLED) {
 				await res.status(501).send({ message: 'Metrics are not enabled' });
 				return;
 			}
@@ -39,13 +40,28 @@ export class DvrMetrics {
 			const metrics = await this.collect();
 			await res
 				.status(200) //
-				.header('content-type', promClient.register.contentType)
+				.header('content-type', register.contentType)
 				.send(metrics);
+		});
+
+		this.#server.get('/status', async (_, res) => {
+			const videos = server.tracker.values().toArray();
+
+			const payload: string[] = videos
+				.sort((a, b) => b.date.localeCompare(a.date))
+				.map((video) => `${video.date}  ${video.storage.padEnd(8, ' ')}  ${video.path}`);
+
+			payload.unshift('date                      storage   file');
+
+			await res //
+				.status(200)
+				.header('content-type', 'text/plain')
+				.send(payload.join('\n'));
 		});
 	}
 
 	public async collect(): Promise<string> {
-		return promClient.register.metrics();
+		return await register.metrics();
 	}
 
 	public async listen(options: { host: string; port: number }): Promise<void> {
@@ -56,7 +72,7 @@ export class DvrMetrics {
 	}
 
 	public async shutdown(): Promise<void> {
-		promClient.register.clear();
+		register.clear();
 		await this.#server.close();
 	}
 }

@@ -8,7 +8,9 @@ export const DvrWebhookSchema = {
 	type: 'object',
 	additionalProperties: false,
 	required: [
-		'file' //
+		'app', //
+		'stream',
+		'file'
 	],
 	properties: {
 		server_id: { type: 'string' },
