@@ -20,7 +20,9 @@ export async function restartUploads(): Promise<void> {
 			for (const file of await readdir(streamPath)) {
 				const path = join(streamPath, file);
 
-				if (!file.endsWith('.flv')) continue;
+				if (!file.endsWith('.flv') || server.tracker.has(path)) {
+					continue;
+				}
 
 				total += 1;
 
