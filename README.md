@@ -9,8 +9,8 @@ Upload [SRS](https://ossrs.io/lts/en-us/) recordings to the cloud.
 ```yaml
 services:
   srs:
-	image: ossrs/srs:v6
-	...
+    image: ossrs/srs:v6
+    ...
     environment:
       SRS_VHOST_HTTP_HOOKS_ON_DVR: http://dvr:3001/v1/azure
     volumes:
