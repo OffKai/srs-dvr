@@ -19,9 +19,6 @@ RUN yarn install --immutable && \
 ## App ##
 FROM base AS app
 
-LABEL org.opencontainers.image.source=https://github.com/OffKai/srs-dvr
-LABEL org.opencontainers.image.licenses=Apache-2.0
-
 ENV NODE_ENV=production
 
 WORKDIR /dvr
