@@ -57,10 +57,12 @@ export const azureUpload: UploadFunc = async (uploadPath, filePath, options) => 
 			return;
 		}
 
-		try {
-			await rm(filePath);
-		} catch (err: unknown) {
-			server.log.error(err, `failed to delete file: ${filePath}`);
+		if (!server.config.DVR_DISABLE_CLEANUP) {
+			try {
+				await rm(filePath);
+			} catch (err: unknown) {
+				server.log.error(err, `failed to delete file: ${filePath}`);
+			}
 		}
 
 		server.log.info(`file uploaded (${attempt}): ${filePath}`);

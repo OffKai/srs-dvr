@@ -7,7 +7,7 @@ import type { TrackerVideo } from './srs.js';
 
 declare module 'fastify' {
 	interface FastifyInstance {
-		config: z.infer<typeof ConfigSchema>;
+		config: Readonly<z.infer<typeof ConfigSchema>>;
 		metrics?: DvrMetrics;
 		tracker: Map<string, TrackerVideo>;
 	}
