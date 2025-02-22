@@ -22,7 +22,7 @@
 		"dry-run": "yarn check && yarn build && yarn test",
 		"docker": "docker buildx build -t offkai/srs-dvr .",
 		"stream": "./scripts/stream.sh",
-		"purge": "sudo rm -r ./data",
+		"purge": "sudo rm -r ./data/*",
 		"prepare": "husky"
 	},
 	"dependencies": {
