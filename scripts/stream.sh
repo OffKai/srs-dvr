@@ -33,9 +33,13 @@ cd "$(dirname "$0")"
 sudo chown -R $USER ../data/live/livestream # SRS runs as root
 rm -r ../data/live/livestream # Remove old files
 
+# player: http://localhost:8080/players/srs_player.html?autostart=true&app=app_id&stream=stream_id.flv&port=8080&schema=http
+
 ffmpeg \
 	-f lavfi \
 	-i testsrc=$quality$duration \
 	-c:v libx264 \
+	-profile:v baseline \
+	-vf format=yuv420p \
 	-flvflags no_duration_filesize \
 	-f flv rtmp://localhost:1935/app_id/stream_id
