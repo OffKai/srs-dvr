@@ -20,7 +20,6 @@ export const azureUpload: UploadFunc = async (uploadPath, filePath, options) => 
 
 	const execute = async (): Promise<void> => {
 		server.log.info(`uploading file: ${filePath}`);
-		server.metrics?.upload.attempt.inc({ storage: 'azure' });
 
 		let stream: ReadStream | undefined;
 		try {
@@ -46,7 +45,6 @@ export const azureUpload: UploadFunc = async (uploadPath, filePath, options) => 
 			stream?.destroy();
 
 			server.log.error(err, `failed to upload file: ${filePath}`);
-			server.metrics?.upload.failure.inc({ storage: 'azure' });
 
 			if (options?.onFailure) {
 				await options.onFailure();
@@ -64,7 +62,6 @@ export const azureUpload: UploadFunc = async (uploadPath, filePath, options) => 
 		}
 
 		server.log.info(`file uploaded: ${filePath}`);
-		server.metrics?.upload.success.inc({ storage: 'azure' });
 
 		if (options?.onComplete) {
 			await options.onComplete();

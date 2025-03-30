@@ -48,16 +48,20 @@ export const azureRoutes: FastifyPluginAsync = async (server) => {
 				filename: video.filename
 			});
 
-			const cleanup = (): void => {
-				server.tracker.delete(path);
-			};
+			server.metrics?.upload.attempt.inc({ storage: 'azure' });
 
 			await azureUpload(uploadPath, path, {
 				onProgress: ({ bytes }) => {
 					server.metrics?.upload.bytes.inc({ storage: 'azure' }, bytes);
 				},
-				onComplete: cleanup,
-				onFailure: cleanup
+				onComplete: () => {
+					server.metrics?.upload.success.inc({ storage: 'azure' });
+					server.tracker.delete(path);
+				},
+				onFailure: () => {
+					server.metrics?.upload.failure.inc({ storage: 'azure' });
+					server.tracker.delete(path);
+				}
 			});
 		}
 	);
