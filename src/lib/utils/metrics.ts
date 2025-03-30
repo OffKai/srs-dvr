@@ -1,27 +1,11 @@
-import { register, Counter } from 'prom-client';
+import { register, Counter, Gauge } from 'prom-client';
 import { type FastifyInstance, fastify } from 'fastify';
 import { server } from '../../server.js';
 
 export class DvrMetrics {
 	readonly #server: FastifyInstance;
 
-	public readonly upload = {
-		attempt: new Counter({
-			name: 'dvr_upload_attempts',
-			help: 'The count of upload attempts',
-			labelNames: ['storage']
-		}),
-		success: new Counter({
-			name: 'dvr_upload_successes',
-			help: 'The count of upload successes',
-			labelNames: ['storage']
-		}),
-		failure: new Counter({
-			name: 'dvr_upload_failures',
-			help: 'The count of upload failures',
-			labelNames: ['storage']
-		})
-	};
+	public readonly upload = upload;
 
 	public constructor() {
 		this.#server = fastify({
@@ -76,3 +60,34 @@ export class DvrMetrics {
 		await this.#server.close();
 	}
 }
+
+const upload = {
+	attempt: new Counter({
+		name: 'dvr_upload_attempt_count',
+		help: 'Count of upload attempts',
+		labelNames: ['storage']
+	}),
+	success: new Counter({
+		name: 'dvr_upload_success_count',
+		help: 'Count of upload successes',
+		labelNames: ['storage']
+	}),
+	failure: new Counter({
+		name: 'dvr_upload_failure_count',
+		help: 'Count of upload failures',
+		labelNames: ['storage']
+	}),
+	bytes: new Counter({
+		name: 'dvr_upload_byte_count',
+		help: 'Count of bytes uploaded',
+		labelNames: ['storage']
+	}),
+	inprogress: new Gauge({
+		name: 'dvr_upload_inprogress_total',
+		help: 'Gauge of uploads in progress',
+		collect() {
+			if (!server.ready) return;
+			this.set(server.tracker.size);
+		}
+	})
+};

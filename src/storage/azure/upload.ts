@@ -4,6 +4,7 @@ import { setTimeout } from 'node:timers';
 import { server } from '../../server.js';
 import { getAzureContainerClient } from './client.js';
 import type { UploadFunc } from '../../lib/types/srs.js';
+import type { BlockBlobUploadStreamOptions } from '@azure/storage-blob';
 
 const BLOCK_BUFFER_SIZE_BYTES = 8 * 1024 * 1024; // 8MB
 const MAX_CONCURRENCY = 5;
@@ -28,7 +29,18 @@ export const azureUpload: UploadFunc = async (uploadPath, filePath, options) => 
 		try {
 			// Setting bufferSize and highWaterMark to the same value is recommended
 			stream = createReadStream(filePath, { highWaterMark: BLOCK_BUFFER_SIZE_BYTES });
-			await blockClient.uploadStream(stream, BLOCK_BUFFER_SIZE_BYTES, MAX_CONCURRENCY);
+
+			const opts: BlockBlobUploadStreamOptions = {
+				tier: server.config.DVR_AZURE_ACCESS_TIER
+			};
+
+			if (options?.onProgress) {
+				opts.onProgress = (progress) => {
+					options.onProgress!({ bytes: progress.loadedBytes });
+				};
+			}
+
+			await blockClient.uploadStream(stream, BLOCK_BUFFER_SIZE_BYTES, MAX_CONCURRENCY, opts);
 		} catch (err: unknown) {
 			stream?.destroy(); // TODO - Check if it's destroyed in the azure package
 

@@ -38,16 +38,22 @@ services:
 
 ### Config
 
-| Environment variable          | Default | Description                                                                              |
-| ----------------------------- | ------- | ---------------------------------------------------------------------------------------- |
-| `PORT`                        | 3001    | The port for the API server to use.                                                      |
-| `METRICS_PORT`                | 3002    | The port for the metrics server to use.                                                  |
-| `DVR_METRICS_ENABLED`         | false   | If [Prometheus](https://prometheus.io/) metrics should be enabled.                       |
-| `DVR_DATA_ROOT`               |         | The path root to check for recordings. Must match the `dvr_path` root in the SRS config. |
-| `DVR_DISABLE_CLEANUP`         | false   | Disable file deletions after a successful upload.                                        |
-| `DVR_DEFAULT_STORAGE`         |         | The default storage provider to use, notably for uploads on restart. One of: `azure`.    |
-| `DVR_AZURE_CONNECTION_STRING` |         | The connection string for Azure blob storage.                                            |
-| `DVR_AZURE_CONTAINER_NAME`    |         | The name of the Azure blob storage container to use.                                     |
+| Environment variable  | Required | Default | Description                                                                              |
+| --------------------- | -------- | ------- | ---------------------------------------------------------------------------------------- |
+| `PORT`                |          | 3001    | The port for the API server to use.                                                      |
+| `METRICS_PORT`        |          | 3002    | The port for the metrics server to use.                                                  |
+| `DVR_METRICS_ENABLED` |          | false   | If [Prometheus](https://prometheus.io/) metrics should be enabled.                       |
+| `DVR_DATA_ROOT`       | ✓        |         | The path root to check for recordings. Must match the `dvr_path` root in the SRS config. |
+| `DVR_DISABLE_CLEANUP` |          | false   | Disable file deletions after a successful upload.                                        |
+| `DVR_DEFAULT_STORAGE` | ✓        |         | The default storage provider to use, notably for uploads on restart. One of: `azure`.    |
+
+#### Azure config
+
+| Environment variable          | Required | Default | Description                                                                                                                                     |
+| ----------------------------- | -------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DVR_AZURE_CONNECTION_STRING` | ✓        |         | The connection string for Azure blob storage.                                                                                                   |
+| `DVR_AZURE_CONTAINER_NAME`    | ✓        |         | The name of the Azure blob storage container to use.                                                                                            |
+| `DVR_AZURE_ACCESS_TIER`       |          |         | The storage access tier to use, defaults to account setting. See: <https://learn.microsoft.com/en-us/azure/storage/blobs/access-tiers-overview> |
 
 ## Contributing
 
