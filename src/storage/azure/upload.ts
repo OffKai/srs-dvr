@@ -1,6 +1,5 @@
 import { rm } from 'node:fs/promises';
 import { createReadStream, ReadStream } from 'node:fs';
-import { setTimeout } from 'node:timers';
 import { server } from '../../server.js';
 import { getAzureContainerClient } from './client.js';
 import type { UploadFunc } from '../../lib/types/srs.js';
@@ -8,7 +7,6 @@ import type { BlockBlobUploadStreamOptions } from '@azure/storage-blob';
 
 const BLOCK_BUFFER_SIZE_BYTES = 8 * 1024 * 1024; // 8MB
 const MAX_CONCURRENCY = 5;
-const MAX_RETRIES = 5;
 
 const azureClient = await getAzureContainerClient();
 
@@ -18,11 +16,10 @@ const azureClient = await getAzureContainerClient();
  * @param path - The path to the file
  */
 export const azureUpload: UploadFunc = async (uploadPath, filePath, options) => {
-	let attempt = 1;
 	const blockClient = azureClient.getBlockBlobClient(uploadPath);
 
 	const execute = async (): Promise<void> => {
-		server.log.info(`uploading file (${attempt}): ${filePath}`);
+		server.log.info(`uploading file: ${filePath}`);
 		server.metrics?.upload.attempt.inc({ storage: 'azure' });
 
 		let stream: ReadStream | undefined;
@@ -35,36 +32,25 @@ export const azureUpload: UploadFunc = async (uploadPath, filePath, options) => 
 			};
 
 			if (options?.onProgress) {
-				opts.onProgress = (progress) => {
-					options.onProgress!({ bytes: progress.loadedBytes });
+				let progress = 0;
+
+				opts.onProgress = ({ loadedBytes }) => {
+					// ref: https://github.com/Azure/azure-sdk-for-js/blob/92e38f91570ed143982c832361f894aae287db63/sdk/storage/storage-blob/src/Clients.ts#L4398
+					options.onProgress!({ bytes: loadedBytes - progress });
+					progress = loadedBytes;
 				};
 			}
 
 			await blockClient.uploadStream(stream, BLOCK_BUFFER_SIZE_BYTES, MAX_CONCURRENCY, opts);
 		} catch (err: unknown) {
-			stream?.destroy(); // TODO - Check if it's destroyed in the azure package
+			stream?.destroy();
 
-			server.log.error(err, `failed to upload file (${attempt}): ${filePath}`);
+			server.log.error(err, `failed to upload file: ${filePath}`);
+			server.metrics?.upload.failure.inc({ storage: 'azure' });
 
-			if (attempt >= MAX_RETRIES) {
-				server.log.error(`failed to upload file after ${MAX_RETRIES} attempts: ${filePath}`);
-				server.metrics?.upload.failure.inc({ storage: 'azure' });
-
-				if (options?.onAbort) {
-					await options.onAbort();
-				}
-
-				return;
+			if (options?.onFailure) {
+				await options.onFailure();
 			}
-
-			server.log.warn(`retrying upload (${attempt}): ${filePath}`);
-
-			const delay = 1000 * Math.pow(2, attempt);
-			attempt += 1;
-
-			setTimeout(async () => {
-				await execute();
-			}, delay);
 
 			return;
 		}
@@ -77,7 +63,7 @@ export const azureUpload: UploadFunc = async (uploadPath, filePath, options) => 
 			}
 		}
 
-		server.log.info(`file uploaded (${attempt}): ${filePath}`);
+		server.log.info(`file uploaded: ${filePath}`);
 		server.metrics?.upload.success.inc({ storage: 'azure' });
 
 		if (options?.onComplete) {

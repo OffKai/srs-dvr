@@ -31,8 +31,10 @@ export const ConfigSchema = z.object({
 		.default('false'),
 	/** The default storage type to use. */
 	DVR_DEFAULT_STORAGE: z.enum<StorageTypes, [StorageTypes, ...StorageTypes[]]>(['azure']),
-	/** The connection string for Azure Blob Storage. */
-	DVR_AZURE_CONNECTION_STRING: z.string(),
+	/** The Azure Blob Storage account name. */
+	DVR_AZURE_ACCOUNT_NAME: z.string(),
+	/** The Azure Blob Storage account key. */
+	DVR_AZURE_ACCOUNT_KEY: z.string(),
 	/** The container name for Azure Blob Storage. */
 	DVR_AZURE_CONTAINER_NAME: z.string(),
 	/** The access tier for Azure Blob Storage. */
@@ -50,7 +52,8 @@ export function loadConfig(): Readonly<z.infer<typeof ConfigSchema>> {
 		DVR_DATA_ROOT: process.env.DVR_DATA_ROOT,
 		DVR_DISABLE_CLEANUP: process.env.DVR_DISABLE_CLEANUP,
 		DVR_DEFAULT_STORAGE: process.env.DVR_DEFAULT_STORAGE,
-		DVR_AZURE_CONNECTION_STRING: process.env.DVR_AZURE_CONNECTION_STRING,
+		DVR_AZURE_ACCOUNT_NAME: process.env.DVR_AZURE_ACCOUNT_NAME,
+		DVR_AZURE_ACCOUNT_KEY: process.env.DVR_AZURE_ACCOUNT_KEY,
 		DVR_AZURE_CONTAINER_NAME: process.env.DVR_AZURE_CONTAINER_NAME,
 		DVR_AZURE_ACCESS_TIER: process.env.DVR_AZURE_ACCESS_TIER
 	};
@@ -64,7 +67,8 @@ export function loadConfig(): Readonly<z.infer<typeof ConfigSchema>> {
 			DVR_DATA_ROOT: '/data',
 			DVR_DISABLE_CLEANUP: 'false',
 			DVR_DEFAULT_STORAGE: 'azure',
-			DVR_AZURE_CONNECTION_STRING: '',
+			DVR_AZURE_ACCOUNT_NAME: 'account',
+			DVR_AZURE_ACCOUNT_KEY: 'key',
 			DVR_AZURE_CONTAINER_NAME: 'test',
 			DVR_AZURE_ACCESS_TIER: 'hot'
 		};

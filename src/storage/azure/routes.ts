@@ -57,7 +57,7 @@ export const azureRoutes: FastifyPluginAsync = async (server) => {
 					server.metrics?.upload.bytes.inc({ storage: 'azure' }, bytes);
 				},
 				onComplete: cleanup,
-				onAbort: cleanup
+				onFailure: cleanup
 			});
 		}
 	);

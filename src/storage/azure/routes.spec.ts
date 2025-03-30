@@ -2,7 +2,7 @@ import { ReadStream } from 'node:fs';
 import { MockBody } from '../../mocks/request.js';
 import { server } from '../../server.js';
 import { azureRoutes } from './routes.js';
-import type { BlobServiceClient, BlockBlobClient, ContainerClient } from '@azure/storage-blob';
+import type { BlockBlobClient, ContainerClient } from '@azure/storage-blob';
 
 async function flushPromises() {
 	// ref: https://github.com/jestjs/jest/issues/2157#issuecomment-279171856
@@ -10,25 +10,8 @@ async function flushPromises() {
 }
 
 const mocks = vi.hoisted(() => {
-	const uploadStream = vi.fn();
-
-	class MockBlobServiceClient implements Partial<BlobServiceClient> {
-		// @ts-expect-error - Partial client
-		public getContainerClient = vi.fn<() => Partial<ContainerClient>>(() => {
-			return {
-				getBlockBlobClient: vi.fn<() => Partial<BlockBlobClient>>(() => ({
-					uploadStream
-				})),
-				exists: vi.fn(() => Promise.resolve(true))
-			};
-		});
-
-		public static fromConnectionString = vi.fn(() => new MockBlobServiceClient());
-	}
-
 	return {
-		uploadStream,
-		MockBlobServiceClient,
+		uploadStream: vi.fn(),
 		rm: vi.fn(),
 		existsSync: vi.fn(() => true)
 	};
@@ -48,8 +31,15 @@ vi.mock('node:fs', async (og) => {
 	};
 });
 vi.mock('node:fs/promises', () => ({ rm: mocks.rm }));
-vi.mock('@azure/storage-blob', () => ({
-	BlobServiceClient: mocks.MockBlobServiceClient
+vi.mock('./client.js', () => ({
+	// @ts-expect-error - Partial client
+	getAzureContainerClient: vi.fn<() => Partial<ContainerClient>>(() => {
+		return {
+			getBlockBlobClient: vi.fn<() => Partial<BlockBlobClient>>(() => ({
+				uploadStream: mocks.uploadStream
+			}))
+		};
+	})
 }));
 
 describe('Azure routes', () => {
@@ -85,7 +75,7 @@ describe('Azure routes', () => {
 			expect(mocks.rm).toHaveBeenCalledWith(body.file);
 		});
 
-		test('uploadStream throws error once', async () => {
+		test('uploadStream throws error', async () => {
 			mocks.uploadStream.mockRejectedValueOnce(new Error());
 
 			const response = await server.inject({
@@ -99,9 +89,8 @@ describe('Azure routes', () => {
 			expect(response.statusCode).toBe(200);
 			expect(response.json()).toStrictEqual({ code: 0 });
 
-			expect(mocks.uploadStream).toHaveBeenCalledTimes(2);
-			expect(mocks.rm).toHaveBeenCalledTimes(1);
-			expect(mocks.rm).toHaveBeenCalledWith(body.file);
+			expect(mocks.uploadStream).toHaveBeenCalledTimes(1);
+			expect(mocks.rm).not.toHaveBeenCalled();
 		});
 
 		test('rm throws error', async () => {
@@ -122,24 +111,6 @@ describe('Azure routes', () => {
 			expect(mocks.rm).toHaveBeenCalledTimes(1);
 			expect(mocks.rm).toHaveBeenCalledWith(body.file);
 			await expect(mocks.rm).rejects.toThrow();
-		});
-
-		test('bail with max retries', async () => {
-			mocks.uploadStream.mockRejectedValue(new Error());
-
-			const response = await server.inject({
-				method: 'POST',
-				url: '/v1/azure',
-				body
-			});
-
-			await flushPromises();
-
-			expect(response.statusCode).toBe(200);
-			expect(response.json()).toStrictEqual({ code: 0 });
-
-			expect(mocks.uploadStream).toHaveBeenCalledTimes(5);
-			expect(mocks.rm).not.toHaveBeenCalled();
 		});
 
 		it('should fail if file is already being uploaded', async () => {
