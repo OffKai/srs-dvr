@@ -2,6 +2,7 @@ export type UploadFunc = (
 	uploadPath: string,
 	filePath: string,
 	options?: {
+		onProgress?: (progress: { bytes: number }) => void;
 		onComplete?: () => void | Promise<void>;
 		onAbort?: () => void | Promise<void>;
 	}

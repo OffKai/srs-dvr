@@ -17,5 +17,6 @@ metrics:
             - targets: ["localhost:9972"]
         - job_name: dvr
           metrics_path: /metrics
+          scrape_interval: 5s
           static_configs:
             - targets: ["localhost:3002"]

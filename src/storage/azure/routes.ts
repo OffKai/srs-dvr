@@ -1,9 +1,9 @@
 import { azureUpload } from './upload.js';
 import { getFilePath, fmtUploadPath, verifyFilePath } from '../../lib/utils/fs.js';
 import { DvrWebhookSchema } from '../../lib/utils/constants.js';
+import { basename } from 'node:path';
 import type { FastifyPluginAsync } from 'fastify';
 import type { DvrWebhookPayload, TrackerVideo } from '../../lib/types/srs.js';
-import { basename } from 'node:path';
 
 export const azureRoutes: FastifyPluginAsync = async (server) => {
 	server.post<{ Body: DvrWebhookPayload }>(
@@ -47,13 +47,17 @@ export const azureRoutes: FastifyPluginAsync = async (server) => {
 				stream: video.stream,
 				filename: video.filename
 			});
+
+			const cleanup = (): void => {
+				server.tracker.delete(path);
+			};
+
 			await azureUpload(uploadPath, path, {
-				onComplete: () => {
-					server.tracker.delete(path);
+				onProgress: ({ bytes }) => {
+					server.metrics?.upload.bytes.inc({ storage: 'azure' }, bytes);
 				},
-				onAbort: () => {
-					server.tracker.delete(path);
-				}
+				onComplete: cleanup,
+				onAbort: cleanup
 			});
 		}
 	);

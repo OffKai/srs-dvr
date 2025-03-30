@@ -34,7 +34,11 @@ export const ConfigSchema = z.object({
 	/** The connection string for Azure Blob Storage. */
 	DVR_AZURE_CONNECTION_STRING: z.string(),
 	/** The container name for Azure Blob Storage. */
-	DVR_AZURE_CONTAINER_NAME: z.string()
+	DVR_AZURE_CONTAINER_NAME: z.string(),
+	/** The access tier for Azure Blob Storage. */
+	DVR_AZURE_ACCESS_TIER: z //
+		.enum(['hot', 'Hot', 'cool', 'Cool', 'cold', 'Cold', 'archive', 'Archive'])
+		.optional()
 });
 
 export function loadConfig(): Readonly<z.infer<typeof ConfigSchema>> {
@@ -44,10 +48,11 @@ export function loadConfig(): Readonly<z.infer<typeof ConfigSchema>> {
 		METRICS_PORT: process.env.METRICS_PORT,
 		DVR_METRICS_ENABLED: process.env.DVR_METRICS_ENABLED,
 		DVR_DATA_ROOT: process.env.DVR_DATA_ROOT,
-		DVR_DISABLE_CLEANUP: process.env.DVR_DISABLE_DELETE,
+		DVR_DISABLE_CLEANUP: process.env.DVR_DISABLE_CLEANUP,
 		DVR_DEFAULT_STORAGE: process.env.DVR_DEFAULT_STORAGE,
 		DVR_AZURE_CONNECTION_STRING: process.env.DVR_AZURE_CONNECTION_STRING,
-		DVR_AZURE_CONTAINER_NAME: process.env.DVR_AZURE_CONTAINER_NAME
+		DVR_AZURE_CONTAINER_NAME: process.env.DVR_AZURE_CONTAINER_NAME,
+		DVR_AZURE_ACCESS_TIER: process.env.DVR_AZURE_ACCESS_TIER
 	};
 
 	if (isTesting) {
@@ -60,7 +65,8 @@ export function loadConfig(): Readonly<z.infer<typeof ConfigSchema>> {
 			DVR_DISABLE_CLEANUP: 'false',
 			DVR_DEFAULT_STORAGE: 'azure',
 			DVR_AZURE_CONNECTION_STRING: '',
-			DVR_AZURE_CONTAINER_NAME: 'test'
+			DVR_AZURE_CONTAINER_NAME: 'test',
+			DVR_AZURE_ACCESS_TIER: 'hot'
 		};
 	}
 
