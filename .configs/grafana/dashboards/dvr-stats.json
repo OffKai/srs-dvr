@@ -1,0 +1,322 @@
+{
+	"annotations": {
+		"list": [
+			{
+				"builtIn": 1,
+				"datasource": {
+					"type": "grafana",
+					"uid": "-- Grafana --"
+				},
+				"enable": true,
+				"hide": true,
+				"iconColor": "rgba(0, 211, 255, 1)",
+				"name": "Annotations & Alerts",
+				"type": "dashboard"
+			}
+		]
+	},
+	"editable": true,
+	"fiscalYearStartMonth": 0,
+	"graphTooltip": 0,
+	"id": 2,
+	"links": [],
+	"panels": [
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "Q0WJOQ3FF3HET6FH"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "thresholds"
+					},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "red"
+							},
+							{
+								"color": "#EAB839",
+								"value": 95
+							},
+							{
+								"color": "green",
+								"value": 99
+							}
+						]
+					},
+					"unit": "percent"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 6,
+				"w": 9,
+				"x": 0,
+				"y": 0
+			},
+			"id": 4,
+			"options": {
+				"minVizHeight": 75,
+				"minVizWidth": 75,
+				"orientation": "auto",
+				"reduceOptions": {
+					"calcs": ["lastNotNull"],
+					"fields": "",
+					"values": false
+				},
+				"showThresholdLabels": false,
+				"showThresholdMarkers": true,
+				"sizing": "auto"
+			},
+			"pluginVersion": "11.6.0",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "Q0WJOQ3FF3HET6FH"
+					},
+					"disableTextWrap": false,
+					"editorMode": "code",
+					"expr": "(sum(dvr_upload_successes > 0) or vector(0))\r\n  /\r\nsum(dvr_upload_attempts > 0) * 100",
+					"fullMetaSearch": false,
+					"includeNullMetadata": true,
+					"instant": false,
+					"legendFormat": "__auto",
+					"range": true,
+					"refId": "A",
+					"useBackend": false
+				}
+			],
+			"title": "Upload success rate",
+			"type": "gauge"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "Q0WJOQ3FF3HET6FH"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "thresholds"
+					},
+					"mappings": [],
+					"noValue": "0",
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "yellow"
+							},
+							{
+								"color": "red",
+								"value": 80
+							}
+						]
+					}
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 4,
+				"w": 3,
+				"x": 0,
+				"y": 6
+			},
+			"id": 1,
+			"options": {
+				"colorMode": "value",
+				"graphMode": "area",
+				"justifyMode": "auto",
+				"orientation": "auto",
+				"percentChangeColorMode": "standard",
+				"reduceOptions": {
+					"calcs": ["lastNotNull"],
+					"fields": "",
+					"values": false
+				},
+				"showPercentChange": false,
+				"textMode": "auto",
+				"wideLayout": true
+			},
+			"pluginVersion": "11.6.0",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "Q0WJOQ3FF3HET6FH"
+					},
+					"disableTextWrap": false,
+					"editorMode": "builder",
+					"expr": "dvr_upload_attempts",
+					"fullMetaSearch": false,
+					"includeNullMetadata": true,
+					"instant": false,
+					"legendFormat": "__auto",
+					"range": true,
+					"refId": "A",
+					"useBackend": false
+				}
+			],
+			"title": "Upload attempts",
+			"type": "stat"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "Q0WJOQ3FF3HET6FH"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "thresholds"
+					},
+					"mappings": [],
+					"noValue": "0",
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green"
+							},
+							{
+								"color": "red",
+								"value": 80
+							}
+						]
+					}
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 4,
+				"w": 3,
+				"x": 3,
+				"y": 6
+			},
+			"id": 2,
+			"options": {
+				"colorMode": "value",
+				"graphMode": "area",
+				"justifyMode": "auto",
+				"orientation": "auto",
+				"percentChangeColorMode": "standard",
+				"reduceOptions": {
+					"calcs": ["lastNotNull"],
+					"fields": "",
+					"values": false
+				},
+				"showPercentChange": false,
+				"textMode": "auto",
+				"wideLayout": true
+			},
+			"pluginVersion": "11.6.0",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "Q0WJOQ3FF3HET6FH"
+					},
+					"disableTextWrap": false,
+					"editorMode": "builder",
+					"expr": "dvr_upload_successes",
+					"fullMetaSearch": false,
+					"includeNullMetadata": true,
+					"instant": false,
+					"legendFormat": "__auto",
+					"range": true,
+					"refId": "A",
+					"useBackend": false
+				}
+			],
+			"title": "Upload successes",
+			"type": "stat"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "Q0WJOQ3FF3HET6FH"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "thresholds"
+					},
+					"mappings": [],
+					"noValue": "0",
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "red"
+							}
+						]
+					}
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 4,
+				"w": 3,
+				"x": 6,
+				"y": 6
+			},
+			"id": 3,
+			"options": {
+				"colorMode": "value",
+				"graphMode": "area",
+				"justifyMode": "auto",
+				"orientation": "auto",
+				"percentChangeColorMode": "standard",
+				"reduceOptions": {
+					"calcs": ["lastNotNull"],
+					"fields": "",
+					"values": false
+				},
+				"showPercentChange": false,
+				"textMode": "auto",
+				"wideLayout": true
+			},
+			"pluginVersion": "11.6.0",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "Q0WJOQ3FF3HET6FH"
+					},
+					"disableTextWrap": false,
+					"editorMode": "builder",
+					"expr": "dvr_upload_failures",
+					"fullMetaSearch": false,
+					"includeNullMetadata": true,
+					"instant": false,
+					"legendFormat": "__auto",
+					"range": true,
+					"refId": "A",
+					"useBackend": false
+				}
+			],
+			"title": "Upload failures",
+			"type": "stat"
+		}
+	],
+	"preload": false,
+	"schemaVersion": 41,
+	"tags": [],
+	"templating": {
+		"list": []
+	},
+	"time": {
+		"from": "now-6h",
+		"to": "now"
+	},
+	"timepicker": {},
+	"timezone": "browser",
+	"title": "DVR stats",
+	"uid": "eehd0djvbyq68c",
+	"version": 4
+}
