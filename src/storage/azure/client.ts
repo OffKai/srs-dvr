@@ -1,7 +1,18 @@
-import { BlobServiceClient, ContainerClient } from '@azure/storage-blob';
+import { BlobServiceClient, ContainerClient, StorageSharedKeyCredential } from '@azure/storage-blob';
 import { server } from '../../server.js';
 
-const blobClient = BlobServiceClient.fromConnectionString(server.config.DVR_AZURE_CONNECTION_STRING);
+const blobClient = new BlobServiceClient(
+	`https://${server.config.DVR_AZURE_ACCOUNT_NAME}.blob.core.windows.net`, //
+	new StorageSharedKeyCredential(server.config.DVR_AZURE_ACCOUNT_NAME, server.config.DVR_AZURE_ACCOUNT_KEY),
+	{
+		retryOptions: {
+			maxTries: 5
+		},
+		keepAliveOptions: {
+			enable: true
+		}
+	}
+);
 
 export async function getAzureContainerClient(): Promise<ContainerClient> {
 	const containerClient = blobClient.getContainerClient(server.config.DVR_AZURE_CONTAINER_NAME);

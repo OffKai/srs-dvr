@@ -26,7 +26,8 @@ services:
       #     /other/path/[app]/[stream]/[timestamp].flv; -> "/other/path"
       DVR_DATA_ROOT: "/data"
       DVR_DEFAULT_STORAGE: "azure"
-      DVR_AZURE_CONNECTION_STRING: <secret>
+      DVR_AZURE_ACCOUNT_NAME: <secret>
+      DVR_AZURE_ACCOUNT_KEY: <secret>
       DVR_AZURE_CONTAINER_NAME: "dvr"
     volumes:
       # Mount directory needs to match `DVR_DATA_ROOT`
@@ -49,11 +50,12 @@ services:
 
 #### Azure config
 
-| Environment variable          | Required | Default | Description                                                                                                                                     |
-| ----------------------------- | -------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| `DVR_AZURE_CONNECTION_STRING` | ✓        |         | The connection string for Azure blob storage.                                                                                                   |
-| `DVR_AZURE_CONTAINER_NAME`    | ✓        |         | The name of the Azure blob storage container to use.                                                                                            |
-| `DVR_AZURE_ACCESS_TIER`       |          |         | The storage access tier to use, defaults to account setting. See: <https://learn.microsoft.com/en-us/azure/storage/blobs/access-tiers-overview> |
+| Environment variable       | Required | Default | Description                                                                                                                                     |
+| -------------------------- | -------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
+| `DVR_AZURE_ACCOUNT_NAME`   | ✓        |         | The name of the Azure blob storage account.                                                                                                     |
+| `DVR_AZURE_ACCOUNT_KEY`    | ✓        |         | An access key for the Azure blob storage account.                                                                                               |
+| `DVR_AZURE_CONTAINER_NAME` | ✓        |         | The name of the Azure blob storage container to use.                                                                                            |
+| `DVR_AZURE_ACCESS_TIER`    |          |         | The storage access tier to use, defaults to account setting. See: <https://learn.microsoft.com/en-us/azure/storage/blobs/access-tiers-overview> |
 
 ## Contributing
 

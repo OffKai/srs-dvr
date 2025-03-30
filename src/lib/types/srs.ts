@@ -4,7 +4,7 @@ export type UploadFunc = (
 	options?: {
 		onProgress?: (progress: { bytes: number }) => void;
 		onComplete?: () => void | Promise<void>;
-		onAbort?: () => void | Promise<void>;
+		onFailure?: () => void | Promise<void>;
 	}
 ) => Promise<void>;
 
