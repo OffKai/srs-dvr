@@ -3,7 +3,6 @@ import yaml from 'yaml';
 import { readFile } from 'node:fs/promises';
 import { CONFIG_PATH } from '../utils/constants.js';
 
-// const DVR_PATH_REGEX = /^(\/\w+)\/\S+\.flv$/;
 const SUBSTITUTE_REGEX = /^\$\{(\w+)\}$/;
 
 export async function getYamlConfig(path = CONFIG_PATH): Promise<Record<string, unknown>> {

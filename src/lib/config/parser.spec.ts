@@ -3,10 +3,6 @@ import { hydrateYaml, readEnvVar } from './parser.js';
 import type { DvrConfig } from './schema.js';
 
 describe('parser', () => {
-	afterEach(() => {
-		vi.unstubAllEnvs();
-	});
-
 	describe('readEnvVar', () => {
 		it('should substitute string', () => {
 			vi.stubEnv('TEST_ENV_VAR', 'test_value');

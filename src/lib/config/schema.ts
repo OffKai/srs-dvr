@@ -71,11 +71,11 @@ export const DvrConfigSchema = z
 						containerName: z //
 							.string()
 							.describe('Azure Blob Storage container to upload to'),
-						/** Access tier for uploaded files. `default` uses the access tier set on the account. */
+						/** Access tier for uploaded files. `default` uses the default access tier set on the account. */
 						accessTier: z //
 							.enum(['default', 'hot', 'cool', 'cold', 'archive'])
 							.default('default')
-							.describe('Access tier for uploaded files. `default` uses the access tier set on the account.')
+							.describe('Access tier for uploaded files. `default` uses the default access tier set on the account.')
 					})
 					.describe('Settings for Azure Blob Storage')
 			})

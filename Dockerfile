@@ -21,7 +21,7 @@ FROM base AS app
 
 ENV NODE_ENV=production
 
-WORKDIR /dvr
+WORKDIR /etc/dvr
 
 COPY --from=builder /temp/node_modules node_modules/
 COPY --from=builder /temp/dist dist/

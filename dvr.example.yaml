@@ -7,7 +7,7 @@ metrics:
   port: 3002
 
 storage:
-  autoCleanup: true
+  autoCleanup: false
   dataRoot: /data
   defaultStorage: azure
   azure:

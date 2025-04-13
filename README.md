@@ -22,7 +22,7 @@ services:
     restart: unless-stopped
     volumes:
       - ./dvr.config.yaml:/etc/dvr/dvr.config.yaml:ro
-      - ./recordings:/data
+      - ./recordings:/recordings
     ports:
         - 127.0.0.1:3001:3001/tcp # API server
         - 127.0.0.1:3002:3002/tcp # Prometheus metrics
@@ -52,12 +52,16 @@ dvr:
 metrics:
   # Enable or disable metrics collection
   enabled: [boolean=false]
+  # Port the metrics server should listen on
   port: [integer=3002]
 
 storage:
   # Enable automatic cleanup of uploaded files
-  autoCleanup: [boolean=false]
-  # Root directory that recordings are stored in
+  autoCleanup: [boolean=true]
+  # Base path that SRS recordings are written to
+  # Example:
+  #     /data/[app]/[stream]/[timestamp].flv;       -> /data
+  #     /other/path/[app]/[stream]/[timestamp].flv; -> /other/path
   dataRoot: <string>
   # Default storage provider to use
   defaultStorage: <enum> # one of: azure

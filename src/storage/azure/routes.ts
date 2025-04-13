@@ -1,9 +1,9 @@
 import { azureUpload } from './upload.js';
-import { getFilePath, fmtUploadPath, verifyFilePath } from '../../lib/utils/fs.js';
+import { resolveFilePath, fmtUploadPath, verifyFilePath } from '../../lib/utils/fs.js';
 import { DvrWebhookSchema } from '../../lib/utils/constants.js';
 import { basename } from 'node:path';
 import type { FastifyPluginCallback } from 'fastify';
-import type { DvrWebhookPayload, TrackerVideo } from '../../lib/types/srs.js';
+import type { DvrWebhookPayload, TrackerEntry } from '../../lib/types/srs.js';
 
 export const azureRoutes: FastifyPluginCallback = (server) => {
 	server.post<{ Body: DvrWebhookPayload }>(
@@ -17,9 +17,8 @@ export const azureRoutes: FastifyPluginCallback = (server) => {
 				return await res.status(400).send({ code: 1 });
 			}
 
-			const path = getFilePath(req.body.file);
-			const isValid = verifyFilePath(path);
-			if (!isValid) {
+			const path = resolveFilePath(req.body.file);
+			if (path === null || !verifyFilePath(path)) {
 				server.log.error(`invalid file path: ${path}`);
 				return await res.status(400).send({ code: 1 });
 			}
@@ -29,7 +28,7 @@ export const azureRoutes: FastifyPluginCallback = (server) => {
 				return await res.status(400).send({ code: 1 });
 			}
 
-			const video: TrackerVideo = {
+			const recording: TrackerEntry = {
 				app: req.body.app,
 				stream: req.body.stream,
 				filename: basename(path),
@@ -38,14 +37,14 @@ export const azureRoutes: FastifyPluginCallback = (server) => {
 				date: new Date().toISOString()
 			};
 
-			server.tracker.set(path, video);
+			server.tracker.set(path, recording);
 
 			await res.status(200).send({ code: 0 });
 
 			const uploadPath = fmtUploadPath({
-				app: video.app,
-				stream: video.stream,
-				filename: video.filename
+				app: recording.app,
+				stream: recording.stream,
+				filename: recording.filename
 			});
 
 			server.metrics?.upload.attempt.inc({ storage: 'azure' });

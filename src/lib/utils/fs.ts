@@ -1,28 +1,32 @@
 import { resolve } from 'node:path';
-import { isDev, isTesting } from './constants.js';
 import { existsSync } from 'node:fs';
+import { isDev, RECORDINGS_PATH } from './constants.js';
 import { server } from '../../server.js';
 
-export function getFilePath(path: string): string {
-	if (isDev && !isTesting) {
-		// Resolves /data to ./data for local use
+const { storage } = server.config;
+
+const DATA_ROOT_REGEX = new RegExp(`^${storage.dataRoot}`);
+
+export function resolveFilePath(path: string): string | null {
+	if (isDev) {
+		// Return relative path during development
 		return resolve(`.${path}`);
 	}
 
-	return path;
-}
+	if (path.startsWith(RECORDINGS_PATH)) {
+		return path;
+	}
 
-export function fmtUploadPath(data: { app: string; stream: string; filename: string }): string {
-	return `${data.app}/${data.stream}/${data.filename}`;
+	if (!path.startsWith(storage.dataRoot)) {
+		return null;
+	}
+
+	return path.replace(DATA_ROOT_REGEX, RECORDINGS_PATH);
 }
 
 export function verifyFilePath(path: string): boolean {
-	if (isDev && !isTesting) {
+	if (isDev) {
 		return true;
-	}
-
-	if (!path.startsWith(server.config.storage.dataRoot)) {
-		return false;
 	}
 
 	if (!path.endsWith('.flv')) {
@@ -30,4 +34,8 @@ export function verifyFilePath(path: string): boolean {
 	}
 
 	return existsSync(path);
+}
+
+export function fmtUploadPath(data: { app: string; stream: string; filename: string }): string {
+	return `${data.app}/${data.stream}/${data.filename}`;
 }

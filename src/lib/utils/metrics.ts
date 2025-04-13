@@ -29,11 +29,11 @@ export class DvrMetrics {
 		});
 
 		this.#server.get('/status', async (_, res) => {
-			const videos = server.tracker.values().toArray();
+			const recordings = server.tracker.values().toArray();
 
-			const payload: string[] = videos
+			const payload: string[] = recordings
 				.sort((a, b) => b.date.localeCompare(a.date))
-				.map((video) => `${video.date}  ${video.storage.padEnd(8, ' ')}  ${video.path}`);
+				.map((recording) => `${recording.date}  ${recording.storage.padEnd(8, ' ')}  ${recording.path}`);
 
 			payload.unshift('date                      storage   file');
 

@@ -1,16 +1,23 @@
 import { readdir } from 'node:fs/promises';
 import { azureUpload } from '../../storage/azure/upload.js';
-import { fmtUploadPath, getFilePath } from './fs.js';
+import { fmtUploadPath, resolveFilePath } from './fs.js';
 import { server } from '../../server.js';
 import { join } from 'node:path';
 
 export async function restartUploads(): Promise<void> {
-	server.log.info('restarting uploads');
-
 	let count = 0;
 	let total = 0;
 
-	const root = getFilePath(server.config.storage.dataRoot);
+	const root = resolveFilePath(server.config.storage.dataRoot);
+	if (root === null) {
+		server.log.error(`invalid data root: ${server.config.storage.dataRoot}`);
+		return;
+	}
+
+	server.log.info(`restarting uploads from ${root}`);
+
+	// /data/[app]/[stream]/[file].flv
+
 	for (const app of await readdir(root)) {
 		const appPath = join(root, app);
 
@@ -27,7 +34,7 @@ export async function restartUploads(): Promise<void> {
 				total += 1;
 
 				if (server.config.storage.defaultStorage === 'azure') {
-					// Move this above when/if more storage options are added
+					// TODO - Move this above when/if more storage options are added
 					server.tracker.set(path, {
 						app,
 						stream,
@@ -70,3 +77,29 @@ export async function restartUploads(): Promise<void> {
 		server.log.info(`uploaded ${count}/${total} files`);
 	}
 }
+
+// TODO - Not used yet(?), need a to access the `dvr_path` setting from SRS
+// This is able to handle an arbitrary dir depth, need to add a limit
+
+// const walkRecordings = async function* (dir: string): AsyncGenerator<string> {
+// 	const entries = await readdir(dir, { withFileTypes: true });
+
+// 	for (const entry of entries) {
+// 		const path = join(dir, entry.name);
+
+// 		const viewable = await access(path, constants.R_OK)
+// 			.then(() => true)
+// 			.catch(() => false);
+
+// 		if (!viewable) {
+// 			server.log.warn(`skipping ${path}: no read access`);
+// 			continue;
+// 		}
+
+// 		if (entry.isDirectory()) {
+// 			yield* walkRecordings(path);
+// 		} else if (path.endsWith('.flv') && !server.tracker.has(path)) {
+// 			yield path;
+// 		}
+// 	}
+// };
