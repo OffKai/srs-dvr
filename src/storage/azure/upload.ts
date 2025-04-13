@@ -28,7 +28,7 @@ export const azureUpload: UploadFunc = async (uploadPath, filePath, options) => 
 
 			const opts: BlockBlobUploadStreamOptions = {};
 
-			// `default` uses the account's access tier, so we don't need to set it
+			// 'default' uses the account's access tier setting, so we don't need to set it
 			if (server.config.storage.azure.accessTier !== 'default') {
 				opts.tier = server.config.storage.azure.accessTier;
 			}
