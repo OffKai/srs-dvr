@@ -12,9 +12,10 @@ export default defineConfig({
 	skipNodeModulesBundle: true,
 	splitting: false,
 	sourcemap: true,
-	target: 'esnext',
+	target: 'es2024',
 	treeshake: 'smallest',
-	tsconfig: './tsconfig.json',
+	tsconfig: 'tsconfig.json',
+	outDir: 'dist',
 	env: {
 		NODE_ENV: process.env.NODE_ENV ?? 'production',
 		TESTING: 'false',

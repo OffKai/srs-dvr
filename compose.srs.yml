@@ -5,7 +5,6 @@ services:
     environment:
       SRS_CONFIG_FILE: /opt/conf/origin.conf
       SRS_VHOST_HTTP_HOOKS_ON_DVR: http://localhost:3001/v1/azure
-      SRS_HTTP_API_AUTH_PASSWORD: admin
       SRS_EXPORTER_ENABLED: on
     env_file:
       - .env

@@ -15,7 +15,7 @@ export const baseConfig = {
 		},
 		parser: tseslint.parser,
 		parserOptions: {
-			project: ['./tsconfig.eslint.json'],
+			projectService: true,
 			sourceType: 'module',
 			ecmaVersion: 2022,
 			warnOnUnsupportedTypeScriptVersion: true
@@ -28,11 +28,13 @@ export const baseConfig = {
 				'ts-expect-error': 'allow-with-description',
 				'ts-ignore': 'allow-with-description'
 			}
-		]
+		],
+		'require-await': 'off',
+		'@typescript-eslint/require-await': 'error'
 	}
 };
 
-/** @type {import('@typescript-eslint/utils').TSESLint.FlatConfig.Config} */
+/** @type {import('@typescript-eslint/utils').TSESLint.FlatConfig.ConfigArray} */
 const config = tseslint.config(
 	eslint.configs.recommended,
 	...tseslint.configs.recommended,

@@ -19,7 +19,7 @@
 		"format": "prettier --write .",
 		"test": "vitest --coverage --run",
 		"test:watch": "vitest --watch",
-		"dry-run": "yarn check && yarn build && yarn test",
+		"dry-run": "yarn check && yarn lint && yarn build && yarn test",
 		"docker": "docker buildx build -t offkai/srs-dvr .",
 		"stream": "./scripts/stream.sh",
 		"purge": "sudo rm -r ./data/*",

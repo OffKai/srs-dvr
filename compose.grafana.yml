@@ -8,7 +8,7 @@ services:
     ports:
       - 127.0.0.1:9090:9090
     volumes:
-      - ./.configs/grafana/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./.configs/grafana/prometheus.yml:/etc/prometheus/prometheus.yml:ro
       - prometheus_storage:/prometheus
 
   grafana: # http://localhost:3000/
@@ -22,8 +22,8 @@ services:
       - 127.0.0.1:3000:3000
     volumes:
       - ./.configs/grafana/dashboards:/var/lib/grafana/dashboards
-      - ./.configs/grafana/dashboard.yml:/etc/grafana/provisioning/dashboards/main.yml
-      - ./.configs/grafana/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml
+      - ./.configs/grafana/dashboard.yml:/etc/grafana/provisioning/dashboards/main.yml:ro
+      - ./.configs/grafana/datasources.yml:/etc/grafana/provisioning/datasources/datasources.yml:ro
       - grafana_storage:/var/lib/grafana
     depends_on:
       - prometheus
@@ -34,11 +34,11 @@ services:
     cap_add:
       - SYS_TIME
     network_mode: host
-    volumes:
-      - ./.configs/grafana/agent.yml:/etc/agent/agent-config.yml
     entrypoint:
       - /bin/grafana-agent
       - -config.file=/etc/agent/agent-config.yml
+    volumes:
+      - ./.configs/grafana/agent.yml:/etc/agent/agent-config.yml:ro
     depends_on:
       - prometheus
 
