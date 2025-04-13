@@ -123,3 +123,7 @@ docker compose -f compose.grafana.yml up -d
 You can then run the DVR with `yarn dev` and test the webhook with `yarn stream sd inf` in another terminal which will run an ffmpeg command to SRS. You can check the [script](/scripts/stream.sh) for more info.
 
 More info about the candidate setting: <https://ossrs.io/lts/en-us/docs/v6/doc/webrtc#config-candidate>
+
+#### Development on MacOS
+
+Since some of the compose files use `network_mode: host`, you'll need to find a method to run containers that supports that.
