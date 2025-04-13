@@ -38,6 +38,7 @@ export const azureUpload: UploadFunc = async (uploadPath, filePath, options) => 
 				let progress = 0;
 
 				opts.onProgress = ({ loadedBytes }) => {
+					// `loadedBytes` is the total, we want the diff
 					// ref: https://github.com/Azure/azure-sdk-for-js/blob/92e38f91570ed143982c832361f894aae287db63/sdk/storage/storage-blob/src/Clients.ts#L4398
 					options.onProgress!({ bytes: loadedBytes - progress });
 					progress = loadedBytes;
