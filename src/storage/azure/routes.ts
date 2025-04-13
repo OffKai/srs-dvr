@@ -2,10 +2,10 @@ import { azureUpload } from './upload.js';
 import { getFilePath, fmtUploadPath, verifyFilePath } from '../../lib/utils/fs.js';
 import { DvrWebhookSchema } from '../../lib/utils/constants.js';
 import { basename } from 'node:path';
-import type { FastifyPluginAsync } from 'fastify';
+import type { FastifyPluginCallback } from 'fastify';
 import type { DvrWebhookPayload, TrackerVideo } from '../../lib/types/srs.js';
 
-export const azureRoutes: FastifyPluginAsync = async (server) => {
+export const azureRoutes: FastifyPluginCallback = (server) => {
 	server.post<{ Body: DvrWebhookPayload }>(
 		'/v1/azure', //
 		{

@@ -2,12 +2,12 @@ import 'fastify';
 
 import type { z } from 'zod';
 import type { DvrMetrics } from '../utils/metrics.js';
-import type { ConfigSchema } from '../utils/config.js';
+import type { DvrConfigSchema } from '../config/schema.js';
 import type { TrackerVideo } from './srs.js';
 
 declare module 'fastify' {
 	interface FastifyInstance {
-		config: Readonly<z.infer<typeof ConfigSchema>>;
+		config: Readonly<z.infer<typeof DvrConfigSchema>>;
 		metrics?: DvrMetrics;
 		tracker: Map<string, TrackerVideo>;
 	}

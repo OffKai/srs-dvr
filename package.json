@@ -11,8 +11,9 @@
 	"homepage": "https://github.com/OffKai/srs-dvr#readme",
 	"scripts": {
 		"dev": "NODE_ENV=development tsup --watch --onSuccess \"yarn start\"",
-		"build": "yarn check && NODE_ENV=development tsup",
+		"build": "yarn check && NODE_ENV=development tsup --onSuccess \"yarn schema\"",
 		"build:prod": "yarn check && tsup",
+		"schema": "tsx scripts/schema.ts",
 		"start": "node --enable-source-maps dist/main.js",
 		"check": "tsc",
 		"lint": "eslint --fix",

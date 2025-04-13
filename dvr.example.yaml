@@ -1,0 +1,17 @@
+---
+dvr:
+  port: 3001
+
+metrics:
+  enabled: true
+  port: 3002
+
+storage:
+  autoCleanup: true
+  dataRoot: /data
+  defaultStorage: azure
+  azure:
+    accountName: ${DVR_AZURE_ACCOUNT_NAME}
+    accountKey: ${DVR_AZURE_ACCOUNT_KEY}
+    containerName: ${DVR_AZURE_CONTAINER_NAME}
+    accessTier: default

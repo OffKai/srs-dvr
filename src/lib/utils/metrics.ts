@@ -16,7 +16,7 @@ export class DvrMetrics {
 		});
 
 		this.#server.get('/metrics', async (_, res) => {
-			if (!server.config.DVR_METRICS_ENABLED) {
+			if (!server.config.metrics.enabled) {
 				await res.status(501).send({ message: 'Metrics are not enabled' });
 				return;
 			}

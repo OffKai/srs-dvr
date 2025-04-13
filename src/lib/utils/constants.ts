@@ -1,7 +1,13 @@
+import { resolve } from 'node:path';
 import type { DvrWebhookPayload } from '../types/srs.js';
 
 export const isDev = process.env.NODE_ENV !== 'production';
 export const isTesting = process.env.TESTING === 'true';
+
+export const APP_VERSION = process.env.npm_package_version;
+
+const CONFIG_NAME = 'dvr.config.yaml';
+export const CONFIG_PATH = isDev ? resolve(CONFIG_NAME) : `/etc/dvr/${CONFIG_NAME}`;
 
 export const DvrWebhookSchema = {
 	$id: 'DvrWebhookPayload',

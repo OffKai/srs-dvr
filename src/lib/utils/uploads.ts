@@ -10,7 +10,7 @@ export async function restartUploads(): Promise<void> {
 	let count = 0;
 	let total = 0;
 
-	const root = getFilePath(server.config.DVR_DATA_ROOT);
+	const root = getFilePath(server.config.storage.dataRoot);
 	for (const app of await readdir(root)) {
 		const appPath = join(root, app);
 
@@ -26,7 +26,7 @@ export async function restartUploads(): Promise<void> {
 
 				total += 1;
 
-				if (server.config.DVR_DEFAULT_STORAGE === 'azure') {
+				if (server.config.storage.defaultStorage === 'azure') {
 					// Move this above when/if more storage options are added
 					server.tracker.set(path, {
 						app,

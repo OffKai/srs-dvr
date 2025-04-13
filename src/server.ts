@@ -1,9 +1,9 @@
 import { fastify } from 'fastify';
 import { DvrWebhookSchema, isDev, isTesting } from './lib/utils/constants.js';
 import { DvrMetrics } from './lib/utils/metrics.js';
-import { loadConfig } from './lib/utils/config.js';
+import { loadConfig } from './lib/config/load.js';
 
-function buildServer() {
+async function buildServer() {
 	const server = fastify({
 		disableRequestLogging: !isDev,
 		logger: {
@@ -23,11 +23,12 @@ function buildServer() {
 		}
 	});
 
-	const cfg = loadConfig();
+	const cfg = await loadConfig();
+
 	server.decorate('config', cfg);
 	server.decorate('tracker', new Map());
 
-	if (cfg.DVR_METRICS_ENABLED) {
+	if (cfg.metrics.enabled) {
 		server.decorate('metrics', new DvrMetrics());
 	}
 
@@ -36,4 +37,4 @@ function buildServer() {
 	return server;
 }
 
-export const server = buildServer();
+export const server = await buildServer();

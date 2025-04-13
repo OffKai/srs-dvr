@@ -1,0 +1,86 @@
+{
+	"type": "object",
+	"properties": {
+		"dvr": {
+			"type": "object",
+			"properties": {
+				"port": {
+					"type": "number",
+					"default": 3001,
+					"description": "Port the HTTP server should listen on"
+				}
+			},
+			"additionalProperties": false,
+			"description": "General settings"
+		},
+		"metrics": {
+			"type": "object",
+			"properties": {
+				"enabled": {
+					"type": "boolean",
+					"default": false,
+					"description": "Enable or disable metrics collection"
+				},
+				"port": {
+					"type": "number",
+					"default": 3002,
+					"description": "Port the metrics server should listen on"
+				}
+			},
+			"additionalProperties": false,
+			"description": "Settings for metrics"
+		},
+		"storage": {
+			"type": "object",
+			"properties": {
+				"autoCleanup": {
+					"type": "boolean",
+					"default": true,
+					"description": "Enable automatic cleanup of uploaded files"
+				},
+				"dataRoot": {
+					"type": "string",
+					"description": "Root directory that recordings are stored in"
+				},
+				"defaultStorage": {
+					"type": "string",
+					"enum": ["azure"],
+					"description": "Default storage provider to use"
+				},
+				"azure": {
+					"type": "object",
+					"properties": {
+						"accountName": {
+							"type": "string",
+							"description": "Azure Blob Storage account name"
+						},
+						"accountKey": {
+							"type": "string",
+							"description": "Azure Blob Storage account key"
+						},
+						"containerName": {
+							"type": "string",
+							"description": "Azure Blob Storage container to upload to"
+						},
+						"accessTier": {
+							"type": "string",
+							"enum": ["default", "hot", "cool", "cold", "archive"],
+							"default": "default",
+							"description": "Access tier for uploaded files. `default` uses the access tier set on the account."
+						}
+					},
+					"required": ["accountName", "accountKey", "containerName"],
+					"additionalProperties": false,
+					"description": "Settings for Azure Blob Storage"
+				}
+			},
+			"required": ["dataRoot", "defaultStorage", "azure"],
+			"additionalProperties": false,
+			"description": "Settings for storage"
+		}
+	},
+	"required": ["dvr", "metrics", "storage"],
+	"additionalProperties": false,
+	"description": "DVR configuration",
+	"$schema": "http://json-schema.org/draft-07/schema#"
+}

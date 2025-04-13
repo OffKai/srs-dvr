@@ -21,7 +21,7 @@ export function verifyFilePath(path: string): boolean {
 		return true;
 	}
 
-	if (!path.startsWith(server.config.DVR_DATA_ROOT)) {
+	if (!path.startsWith(server.config.storage.dataRoot)) {
 		return false;
 	}
 
