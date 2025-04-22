@@ -1,45 +1,95 @@
 #!/bin/bash
 
-# Usage: ./stream.sh <quality> [duration]
+# player: http://localhost:8080/players/srs_player.html?autostart=true&app=dvr&stream=stream_1.flv&port=8080&schema=http
+
+# Usage: ./stream.sh <quality> [options]
 #
-# quality: Quality of the stream. One of `sd` or `hd`.
-# duration: Duration of the stream in seconds. Default is 3 seconds.
+# args:
+#	quality: Quality of the stream. One of `sd` or `hd`.
+#
+# options:
+#	-d, --duration: Duration of the stream in seconds. Default is 5 seconds.
+#	-m, --multi: Number of streams to start concurrently. Default is 1.
+#	--silent: Suppress ffmpeg output.
 #
 # examples:
-#	./stream.sh sd			Stream for 5 seconds in 480p
-#	./stream.sh sd 10		Stream for 10 seconds in 480p
-#	./stream.sh sd inf		Stream indefinitely in 480p
-#	./stream.sh hd			Stream for 5 seconds in 1080p
-#	./stream.sh hd 10		Stream for 10 seconds in 1080p
+#	./stream.sh sd					Stream for 5 seconds in 480p
+#	./stream.sh sd --duration=10	Stream for 10 seconds in 480p
+#	./stream.sh sd --duration=inf	Stream indefinitely in 480p
+#	./stream.sh hd					Stream for 5 seconds in 1080p
+#	./stream.sh hd --duration=10	Stream for 10 seconds in 1080p
 
-quality="size=720x480:rate=30"
-duration=":duration=5"
+## Variables ##
+QUALITY="size=720x480:rate=30"
+DURATION=":duration=5"
+COUNT="1"
+LOGLEVEL="info"
 
+## Args ##
 if [ "$1" = "hd" ]; then
-	quality="size=1920x1080:rate=60"
+	QUALITY="size=1920x1080:rate=60"
 elif [ "$1" != "sd" ]; then
-	echo "Usage: ./stream.sh <quality> [duration]"
+	echo "Usage: ./stream.sh <quality> [options]"
 	exit 1
 fi
 
-if [ "$2" = "inf" ]; then
-	duration=""
-elif [[ -n "$2" ]]; then
-	duration=":duration=$2"
-fi
+## Opts ##
+for i in "$@"; do
+	case $i in
+		-d=*|--duration=*)
+			DURATION_VAL=${i#*=}
+
+			if [ "$DURATION_VAL" = "inf" ]; then
+				DURATION=""
+			elif [[ -n "$DURATION_VAL" ]]; then
+				DURATION=":duration=$DURATION_VAL"
+			fi
+
+			shift
+			;;
+		-m=*|--multi=*)
+			COUNT="${i#*=}"
+			shift
+			;;
+		--silent)
+			LOGLEVEL="error"
+			shift
+			;;
+		-*|--*)
+			echo "Unknown option $i"
+			exit 1
+			;;
+		*)
+			;;
+	esac
+done
+
+function cmd {
+	ffmpeg \
+		-loglevel $LOGLEVEL \
+		-f lavfi \
+		-i testsrc=$QUALITY$DURATION \
+		-c:v libx264 \
+		-profile:v baseline \
+		-vf format=yuv420p \
+		-flvflags no_duration_filesize \
+		-f flv "rtmp://localhost:1935/$1/$2"
+}
 
 cd "$(dirname "$0")"
 
-sudo chown -R $USER ../data/live/livestream # SRS runs as root
-rm -r ../data/live/livestream # Remove old files
+sudo chown -R $USER "../data" # SRS runs as root
+rm -r "../data/dvr/" # Remove old files
 
-# player: http://localhost:8080/players/srs_player.html?autostart=true&app=app_id&stream=stream_id.flv&port=8080&schema=http
+trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
 
-ffmpeg \
-	-f lavfi \
-	-i testsrc=$quality$duration \
-	-c:v libx264 \
-	-profile:v baseline \
-	-vf format=yuv420p \
-	-flvflags no_duration_filesize \
-	-f flv rtmp://localhost:1935/app_id/stream_id
+for i in $(seq 1 $COUNT); do
+	echo "Starting stream $i"
+
+	# Run the last command in the foreground
+	if [ $i = $COUNT ]; then
+		cmd dvr stream_$i
+	else
+		cmd dvr stream_$i &
+	fi
+done
