@@ -5,7 +5,7 @@
 # Usage: ./stream.sh <quality> [options]
 #
 # args:
-#	quality: Quality of the stream. One of `sd` or `hd`.
+#	quality: Quality of the stream. One of `sd`, `hd`, or `4k`.
 #
 # options:
 #	-d, --duration: Duration of the stream in seconds. Default is 5 seconds.
@@ -17,7 +17,7 @@
 #	./stream.sh sd --duration=10	Stream for 10 seconds in 480p
 #	./stream.sh sd --duration=inf	Stream indefinitely in 480p
 #	./stream.sh hd					Stream for 5 seconds in 1080p
-#	./stream.sh hd --duration=10	Stream for 10 seconds in 1080p
+#	./stream.sh 4k					Stream for 5 seconds in 2160p
 
 ## Variables ##
 QUALITY="size=720x480:rate=30"
@@ -28,6 +28,8 @@ LOGLEVEL="info"
 ## Args ##
 if [ "$1" = "hd" ]; then
 	QUALITY="size=1920x1080:rate=60"
+elif [ "$1" = "4k" ]; then
+	QUALITY="size=3840x2160:rate=60"
 elif [ "$1" != "sd" ]; then
 	echo "Usage: ./stream.sh <quality> [options]"
 	exit 1
