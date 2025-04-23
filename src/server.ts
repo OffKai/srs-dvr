@@ -24,6 +24,7 @@ async function buildServer() {
 	});
 
 	const cfg = await loadConfig();
+	server.log.info('config loaded');
 
 	server.decorate('config', cfg);
 	server.decorate('tracker', new Map());

@@ -25,6 +25,20 @@ DURATION=":duration=5"
 COUNT="1"
 LOGLEVEL="info"
 
+## Help ##
+if [ "$1" = "--help" ]; then
+	echo "Usage: ./stream.sh <quality> [options]"
+	echo ""
+	echo "Args:"
+	echo "  quality: quality of the stream. One of \`sd\`, \`hd\`, or \`4k\`."
+	echo ""
+	echo "Options:"
+	echo "  -d, --duration: duration of the stream in seconds. default is 5 seconds."
+	echo "  -m, --multi:    number of streams to start concurrently. default is 1."
+	echo "  --silent:       suppress ffmpeg output."
+	exit 0
+fi
+
 ## Args ##
 if [ "$1" = "hd" ]; then
 	QUALITY="size=1920x1080:rate=60"
@@ -84,6 +98,12 @@ sudo chown -R $USER "../data" # SRS runs as root
 rm -r "../data/dvr/" # Remove old files
 
 trap "trap - SIGTERM && kill -- -$$" SIGINT SIGTERM EXIT
+
+echo "opts"
+echo "  quality:  $QUALITY"
+echo "  duration: $DURATION"
+echo "  streams:  $COUNT"
+echo "  loglevel: $LOGLEVEL"
 
 for i in $(seq 1 $COUNT); do
 	echo "Starting stream $i"

@@ -13,20 +13,25 @@ export const azureRoutes: FastifyPluginCallback = (server) => {
 			attachValidation: true
 		},
 		async (req, res) => {
+			// Send custom response for validation errors
 			if (req.validationError) {
 				return await res.status(400).send({ code: 1 });
 			}
 
+			// Get the path and make sure it exists
 			const path = resolveFilePath(req.body.file);
 			if (path === null || !verifyFilePath(path)) {
 				server.log.error(`invalid file path: ${path}`);
 				return await res.status(400).send({ code: 1 });
 			}
 
+			// Return if it's already being processed
 			if (server.tracker.has(path)) {
 				server.log.error(`file already being uploaded: ${path}`);
 				return await res.status(400).send({ code: 1 });
 			}
+
+			await res.status(200).send({ code: 0 });
 
 			const recording: TrackerEntry = {
 				app: req.body.app,
@@ -38,8 +43,6 @@ export const azureRoutes: FastifyPluginCallback = (server) => {
 			};
 
 			server.tracker.set(path, recording);
-
-			await res.status(200).send({ code: 0 });
 
 			const uploadPath = fmtUploadPath({
 				app: recording.app,

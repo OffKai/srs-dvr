@@ -5,7 +5,6 @@ import { existsSync } from 'node:fs';
 import { resolve } from 'node:path';
 import { loadEnvFile } from 'node:process';
 import type { Unvalidated } from '../types/generic.js';
-import { server } from '../../server.js';
 
 export async function loadConfig(): Promise<DvrConfig> {
 	if (isTesting) {
@@ -45,7 +44,7 @@ export async function loadConfig(): Promise<DvrConfig> {
 	);
 
 	if (cfg.error) {
-		console.error('Failed to load config');
+		console.error('failed to load config');
 
 		for (const err of cfg.error.errors) {
 			console.error(`${err.path[0]}: ${err.message}`);
@@ -55,8 +54,4 @@ export async function loadConfig(): Promise<DvrConfig> {
 	}
 
 	return cfg.data;
-}
-
-export function reloadConfig(): void {
-	server.log.warn('not implemented');
 }
