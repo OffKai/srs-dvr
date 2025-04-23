@@ -1,11 +1,11 @@
 import { azureUpload } from './upload.js';
-import { getFilePath, fmtUploadPath, verifyFilePath } from '../../lib/utils/fs.js';
+import { resolveFilePath, fmtUploadPath, verifyFilePath } from '../../lib/utils/fs.js';
 import { DvrWebhookSchema } from '../../lib/utils/constants.js';
 import { basename } from 'node:path';
-import type { FastifyPluginAsync } from 'fastify';
-import type { DvrWebhookPayload, TrackerVideo } from '../../lib/types/srs.js';
+import type { FastifyPluginCallback } from 'fastify';
+import type { DvrWebhookPayload, TrackerEntry } from '../../lib/types/srs.js';
 
-export const azureRoutes: FastifyPluginAsync = async (server) => {
+export const azureRoutes: FastifyPluginCallback = (server) => {
 	server.post<{ Body: DvrWebhookPayload }>(
 		'/v1/azure', //
 		{
@@ -13,23 +13,27 @@ export const azureRoutes: FastifyPluginAsync = async (server) => {
 			attachValidation: true
 		},
 		async (req, res) => {
+			// Send custom response for validation errors
 			if (req.validationError) {
 				return await res.status(400).send({ code: 1 });
 			}
 
-			const path = getFilePath(req.body.file);
-			const isValid = verifyFilePath(path);
-			if (!isValid) {
+			// Get the path and make sure it exists
+			const path = resolveFilePath(req.body.file);
+			if (path === null || !verifyFilePath(path)) {
 				server.log.error(`invalid file path: ${path}`);
 				return await res.status(400).send({ code: 1 });
 			}
 
+			// Return if it's already being processed
 			if (server.tracker.has(path)) {
 				server.log.error(`file already being uploaded: ${path}`);
 				return await res.status(400).send({ code: 1 });
 			}
 
-			const video: TrackerVideo = {
+			await res.status(200).send({ code: 0 });
+
+			const recording: TrackerEntry = {
 				app: req.body.app,
 				stream: req.body.stream,
 				filename: basename(path),
@@ -38,14 +42,12 @@ export const azureRoutes: FastifyPluginAsync = async (server) => {
 				date: new Date().toISOString()
 			};
 
-			server.tracker.set(path, video);
-
-			await res.status(200).send({ code: 0 });
+			server.tracker.set(path, recording);
 
 			const uploadPath = fmtUploadPath({
-				app: video.app,
-				stream: video.stream,
-				filename: video.filename
+				app: recording.app,
+				stream: recording.stream,
+				filename: recording.filename
 			});
 
 			server.metrics?.upload.attempt.inc({ storage: 'azure' });

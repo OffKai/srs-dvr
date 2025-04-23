@@ -4,16 +4,21 @@ export default defineConfig({
 	test: {
 		globals: true,
 		env: {
-			NODE_ENV: 'development',
+			NODE_ENV: 'production',
 			TESTING: 'true'
 		},
 		coverage: {
 			provider: 'v8',
 			reporter: ['text'],
-			exclude: [...(configDefaults.coverage.exclude ?? []), 'src/mocks/**']
+			include: ['src/**'],
+			exclude: [
+				...(configDefaults.coverage.exclude ?? []), //
+				'src/mocks/**'
+			]
 		},
 		clearMocks: true,
 		mockReset: true,
+		unstubEnvs: true,
 		setupFiles: []
 	}
 });

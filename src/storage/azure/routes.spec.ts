@@ -3,11 +3,7 @@ import { MockBody } from '../../mocks/request.js';
 import { server } from '../../server.js';
 import { azureRoutes } from './routes.js';
 import type { BlockBlobClient, ContainerClient } from '@azure/storage-blob';
-
-async function flushPromises() {
-	// ref: https://github.com/jestjs/jest/issues/2157#issuecomment-279171856
-	await new Promise((resolve) => setImmediate(resolve));
-}
+import { RECORDINGS_PATH } from '../../lib/utils/constants.js';
 
 const mocks = vi.hoisted(() => {
 	return {
@@ -55,7 +51,7 @@ describe('Azure routes', () => {
 		const body = MockBody({
 			app: 'app_id',
 			stream: 'stream_id',
-			file: '/data/app_id/stream_id/video.flv'
+			file: `${server.config.storage.dataRoot}/app_id/stream_id/recording.flv`
 		});
 
 		it('should upload file', async () => {
@@ -65,14 +61,14 @@ describe('Azure routes', () => {
 				body
 			});
 
-			await flushPromises();
+			await Promise.resolve();
 
 			expect(response.statusCode).toBe(200);
 			expect(response.json()).toStrictEqual({ code: 0 });
 
 			expect(mocks.uploadStream).toHaveBeenCalledTimes(1);
 			expect(mocks.rm).toHaveBeenCalledTimes(1);
-			expect(mocks.rm).toHaveBeenCalledWith(body.file);
+			expect(mocks.rm).toHaveBeenCalledWith(`${RECORDINGS_PATH}/app_id/stream_id/recording.flv`);
 		});
 
 		test('uploadStream throws error', async () => {
@@ -83,8 +79,6 @@ describe('Azure routes', () => {
 				url: '/v1/azure',
 				body
 			});
-
-			await flushPromises();
 
 			expect(response.statusCode).toBe(200);
 			expect(response.json()).toStrictEqual({ code: 0 });
@@ -102,14 +96,14 @@ describe('Azure routes', () => {
 				body
 			});
 
-			await flushPromises();
+			await Promise.resolve();
 
 			expect(response.statusCode).toBe(200);
 			expect(response.json()).toStrictEqual({ code: 0 });
 
 			expect(mocks.uploadStream).toHaveBeenCalledTimes(1);
 			expect(mocks.rm).toHaveBeenCalledTimes(1);
-			expect(mocks.rm).toHaveBeenCalledWith(body.file);
+			expect(mocks.rm).toHaveBeenCalledWith(`${RECORDINGS_PATH}/app_id/stream_id/recording.flv`);
 			await expect(mocks.rm).rejects.toThrow();
 		});
 
@@ -124,14 +118,14 @@ describe('Azure routes', () => {
 				body
 			});
 
+			expect(resOne.statusCode).toBe(200);
+			expect(resOne.json()).toStrictEqual({ code: 0 });
+
 			const resTwo = await server.inject({
 				method: 'POST',
 				url: '/v1/azure',
 				body
 			});
-
-			expect(resOne.statusCode).toBe(200);
-			expect(resOne.json()).toStrictEqual({ code: 0 });
 
 			expect(resTwo.statusCode).toBe(400);
 			expect(resTwo.json()).toStrictEqual({ code: 1 });
@@ -159,12 +153,14 @@ describe('Azure routes', () => {
 				body: MockBody({
 					app: 'app_id',
 					stream: 'stream_id',
-					file: '/invalid/video.flv'
+					file: '/invalid/recording.flv'
 				})
 			});
 
 			expect(response.statusCode).toBe(400);
 			expect(response.json()).toStrictEqual({ code: 1 });
+
+			expect(mocks.existsSync).not.toHaveBeenCalled();
 		});
 
 		it('should fail with invalid file extension', async () => {
@@ -174,12 +170,14 @@ describe('Azure routes', () => {
 				body: MockBody({
 					app: 'app_id',
 					stream: 'stream_id',
-					file: '/data/video.txt'
+					file: `${server.config.storage.dataRoot}/recording.txt`
 				})
 			});
 
 			expect(response.statusCode).toBe(400);
 			expect(response.json()).toStrictEqual({ code: 1 });
+
+			expect(mocks.existsSync).not.toHaveBeenCalled();
 		});
 
 		it("should fail if file doesn't exist", async () => {
@@ -191,14 +189,14 @@ describe('Azure routes', () => {
 				body: MockBody({
 					app: 'app_id',
 					stream: 'stream_id',
-					file: '/data/app_id/stream_id/video.flv'
+					file: `${server.config.storage.dataRoot}/app_id/stream_id/recording.flv`
 				})
 			});
 
 			expect(response.statusCode).toBe(400);
 			expect(response.json()).toStrictEqual({ code: 1 });
 
-			expect(mocks.existsSync).toHaveBeenCalledTimes(1);
+			expect(mocks.existsSync).toHaveBeenCalledOnce();
 		});
 	});
 });

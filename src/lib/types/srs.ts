@@ -27,7 +27,7 @@ export type DvrWebhookPayload = {
 
 export type StorageTypes = 'azure';
 
-export type TrackerVideo = {
+export type TrackerEntry = {
 	app: string;
 	stream: string;
 	filename: string;

@@ -1,3 +1,4 @@
+.yarn/cache/
 .yarn/install-state.gz
 data/
 dist/
@@ -6,3 +7,4 @@ node_modules/
 !.env.example
 package-lock.json
 pnpm-lock.yaml
+dvr.config.yaml

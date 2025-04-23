@@ -1,0 +1,17 @@
+---
+dvr:
+  port: 3001
+
+metrics:
+  enabled: true
+  port: 3002
+
+storage:
+  autoCleanup: true
+  dataRoot: /data
+  defaultStorage: azure
+  azure:
+    accountName: name
+    accountKey: key
+    containerName: recordings
+    accessTier: hot

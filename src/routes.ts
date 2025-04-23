@@ -21,5 +21,9 @@ export const routes: FastifyPluginAsync = async (server) => {
 		}
 	});
 
+	server.post('/reload', async (_, res) => {
+		await res.status(405).send();
+	});
+
 	server.log.info('routes loaded');
 };

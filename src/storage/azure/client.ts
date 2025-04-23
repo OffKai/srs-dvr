@@ -1,9 +1,11 @@
 import { BlobServiceClient, ContainerClient, StorageSharedKeyCredential } from '@azure/storage-blob';
 import { server } from '../../server.js';
 
+const { azure } = server.config.storage;
+
 const blobClient = new BlobServiceClient(
-	`https://${server.config.DVR_AZURE_ACCOUNT_NAME}.blob.core.windows.net`, //
-	new StorageSharedKeyCredential(server.config.DVR_AZURE_ACCOUNT_NAME, server.config.DVR_AZURE_ACCOUNT_KEY),
+	`https://${azure.accountName}.blob.core.windows.net`, //
+	new StorageSharedKeyCredential(azure.accountName, azure.accountKey),
 	{
 		retryOptions: {
 			maxTries: 5
@@ -15,11 +17,11 @@ const blobClient = new BlobServiceClient(
 );
 
 export async function getAzureContainerClient(): Promise<ContainerClient> {
-	const containerClient = blobClient.getContainerClient(server.config.DVR_AZURE_CONTAINER_NAME);
+	const containerClient = blobClient.getContainerClient(azure.containerName);
 
 	const exists = await containerClient.exists();
 	if (!exists) {
-		throw new Error(`Blob container "${server.config.DVR_AZURE_CONTAINER_NAME}" does not exist`);
+		throw new Error(`Blob container "${azure.containerName}" does not exist`);
 	}
 
 	return containerClient;

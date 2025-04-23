@@ -26,14 +26,19 @@ export const azureUpload: UploadFunc = async (uploadPath, filePath, options) => 
 			// Setting bufferSize and highWaterMark to the same value is recommended
 			stream = createReadStream(filePath, { highWaterMark: BLOCK_BUFFER_SIZE_BYTES });
 
-			const opts: BlockBlobUploadStreamOptions = {
-				tier: server.config.DVR_AZURE_ACCESS_TIER
-			};
+			const opts: BlockBlobUploadStreamOptions = {};
 
+			// 'default' uses the account's access tier setting, so we don't need to set it
+			if (server.config.storage.azure.accessTier !== 'default') {
+				opts.tier = server.config.storage.azure.accessTier;
+			}
+
+			// Don't need to provide a callback if we don't need it
 			if (options?.onProgress) {
 				let progress = 0;
 
 				opts.onProgress = ({ loadedBytes }) => {
+					// `loadedBytes` is the total, we want the diff
 					// ref: https://github.com/Azure/azure-sdk-for-js/blob/92e38f91570ed143982c832361f894aae287db63/sdk/storage/storage-blob/src/Clients.ts#L4398
 					options.onProgress!({ bytes: loadedBytes - progress });
 					progress = loadedBytes;
@@ -53,7 +58,7 @@ export const azureUpload: UploadFunc = async (uploadPath, filePath, options) => 
 			return;
 		}
 
-		if (!server.config.DVR_DISABLE_CLEANUP) {
+		if (server.config.storage.autoCleanup) {
 			try {
 				await rm(filePath);
 			} catch (err: unknown) {
