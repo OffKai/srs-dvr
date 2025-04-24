@@ -53,6 +53,9 @@
 		"vitest": "3.1.2",
 		"zod-to-json-schema": "^3.24.5"
 	},
+	"resolutions": {
+		"vite": "6.3.2"
+	},
 	"lint-staged": {
 		"*.{js,cjs,ts}": [
 			"eslint --fix"
