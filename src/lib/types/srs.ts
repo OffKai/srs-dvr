@@ -23,7 +23,6 @@ export type DvrWebhookPayload = {
 	file: string;
 	stream_url: string;
 	stream_id: string;
-	dvr?: string;
 };
 
 export type StorageTypes = 'azure';

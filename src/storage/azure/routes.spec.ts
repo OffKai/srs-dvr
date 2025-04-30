@@ -4,6 +4,8 @@ import { server } from '../../server.js';
 import { azureRoutes } from './routes.js';
 import { RECORDINGS_PATH } from '../../lib/utils/constants.js';
 import type { BlockBlobClient, ContainerClient } from '@azure/storage-blob';
+import { flushPromises } from '../../mocks/utils.js';
+import type { DvrWebhookPayload } from '../../lib/types/srs.js';
 
 const mocks = vi.hoisted(() => {
 	return {
@@ -61,7 +63,7 @@ describe('Azure routes', () => {
 				body
 			});
 
-			await Promise.resolve();
+			await flushPromises();
 
 			expect(response.statusCode).toBe(200);
 			expect(response.json()).toStrictEqual({ code: 0 });
@@ -71,7 +73,7 @@ describe('Azure routes', () => {
 			expect(mocks.rm).toHaveBeenCalledWith(`${RECORDINGS_PATH}/app_id/stream_id/recording.flv`);
 		});
 
-		test.skip('uploadStream throws error', async () => {
+		test('uploadStream throws error', async () => {
 			mocks.uploadStream.mockRejectedValueOnce(new Error());
 
 			const response = await server.inject({
@@ -87,7 +89,7 @@ describe('Azure routes', () => {
 			expect(mocks.rm).not.toHaveBeenCalled();
 		});
 
-		test.skip('rm throws error', async () => {
+		test('rm throws error', async () => {
 			mocks.rm.mockRejectedValue(new Error());
 
 			const response = await server.inject({
@@ -96,7 +98,7 @@ describe('Azure routes', () => {
 				body
 			});
 
-			await Promise.resolve();
+			await flushPromises();
 
 			expect(response.statusCode).toBe(200);
 			expect(response.json()).toStrictEqual({ code: 0 });
@@ -107,7 +109,7 @@ describe('Azure routes', () => {
 			await expect(mocks.rm).rejects.toThrow();
 		});
 
-		it.skip('should fail if file is already being uploaded', async () => {
+		it('should fail if file is already being uploaded', async () => {
 			vi.spyOn(server.tracker, 'has') //
 				.mockReturnValueOnce(false)
 				.mockReturnValueOnce(true);
@@ -132,7 +134,13 @@ describe('Azure routes', () => {
 		});
 	});
 
-	describe.skip('validation', () => {
+	describe('validation', () => {
+		const body = MockBody({
+			app: 'app_id',
+			stream: 'stream_id',
+			file: '/invalid/recording.flv'
+		});
+
 		it('should fail with invalid body', async () => {
 			const response = await server.inject({
 				method: 'POST',
@@ -150,11 +158,10 @@ describe('Azure routes', () => {
 			const response = await server.inject({
 				method: 'POST',
 				url: '/v1/azure',
-				body: MockBody({
-					app: 'app_id',
-					stream: 'stream_id',
+				body: {
+					...body,
 					file: '/invalid/recording.flv'
-				})
+				} satisfies DvrWebhookPayload
 			});
 
 			expect(response.statusCode).toBe(400);
@@ -167,11 +174,10 @@ describe('Azure routes', () => {
 			const response = await server.inject({
 				method: 'POST',
 				url: '/v1/azure',
-				body: MockBody({
-					app: 'app_id',
-					stream: 'stream_id',
+				body: {
+					...body,
 					file: `${server.config.storage.dataRoot}/recording.txt`
-				})
+				} satisfies DvrWebhookPayload
 			});
 
 			expect(response.statusCode).toBe(400);
@@ -186,11 +192,10 @@ describe('Azure routes', () => {
 			const response = await server.inject({
 				method: 'POST',
 				url: '/v1/azure',
-				body: MockBody({
-					app: 'app_id',
-					stream: 'stream_id',
+				body: {
+					...body,
 					file: `${server.config.storage.dataRoot}/app_id/stream_id/recording.flv`
-				})
+				} satisfies DvrWebhookPayload
 			});
 
 			expect(response.statusCode).toBe(400);
@@ -200,7 +205,7 @@ describe('Azure routes', () => {
 		});
 	});
 
-	describe.skip('dvr param', () => {
+	describe('dvr param', () => {
 		const body = MockBody({
 			app: 'app_id',
 			stream: 'stream_id',
@@ -213,11 +218,9 @@ describe('Azure routes', () => {
 				url: '/v1/azure',
 				body: {
 					...body,
-					dvr: 'false'
-				}
+					param: '?dvr=false'
+				} satisfies DvrWebhookPayload
 			});
-
-			await Promise.resolve();
 
 			expect(response.statusCode).toBe(200);
 			expect(response.json()).toStrictEqual({ code: 0 });
@@ -233,11 +236,11 @@ describe('Azure routes', () => {
 				url: '/v1/azure',
 				body: {
 					...body,
-					dvr: 'true'
-				}
+					param: '?dvr=true'
+				} satisfies DvrWebhookPayload
 			});
 
-			await Promise.resolve();
+			await flushPromises();
 
 			expect(response.statusCode).toBe(200);
 			expect(response.json()).toStrictEqual({ code: 0 });
@@ -254,7 +257,7 @@ describe('Azure routes', () => {
 				body
 			});
 
-			await Promise.resolve();
+			await flushPromises();
 
 			expect(response.statusCode).toBe(200);
 			expect(response.json()).toStrictEqual({ code: 0 });

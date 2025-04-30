@@ -35,7 +35,8 @@ export const azureRoutes: FastifyPluginCallback = (server) => {
 			}
 
 			// Record by default
-			if (req.body.dvr === 'false') {
+			const params = new URLSearchParams(req.body.param);
+			if (params.get('dvr') === 'false') {
 				await res.status(200).send({ code: 0 });
 
 				if (server.config.storage.autoCleanup) {
