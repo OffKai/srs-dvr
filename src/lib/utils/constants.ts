@@ -35,6 +35,7 @@ export const DvrWebhookSchema = {
 		cwd: { type: 'string' },
 		file: { type: 'string' },
 		stream_url: { type: 'string' },
-		stream_id: { type: 'string' }
+		stream_id: { type: 'string' },
+		dvr: { type: 'string' }
 	} satisfies Record<keyof DvrWebhookPayload, unknown>
 };
