@@ -4,6 +4,7 @@ import { DvrWebhookSchema } from '../../lib/utils/constants.js';
 import { basename } from 'node:path';
 import type { FastifyPluginCallback } from 'fastify';
 import type { DvrWebhookPayload, TrackerEntry } from '../../lib/types/srs.js';
+import { rm } from 'node:fs/promises';
 
 export const azureRoutes: FastifyPluginCallback = (server) => {
 	server.post<{ Body: DvrWebhookPayload }>(
@@ -25,10 +26,32 @@ export const azureRoutes: FastifyPluginCallback = (server) => {
 				return await res.status(400).send({ code: 1 });
 			}
 
+			async function cleanup(path: string) {
+				try {
+					await rm(path);
+				} catch (err: unknown) {
+					server.log.error(err, `failed to delete file: ${path}`);
+				}
+			}
+
+			// Record by default
+			const params = new URLSearchParams(req.body.param);
+			if (params.get('dvr') === 'false') {
+				await res.status(200).send({ code: 0 });
+
+				if (server.config.storage.autoCleanup) {
+					await cleanup(path);
+				}
+
+				return;
+			}
+
 			// Return if it's already being processed
 			if (server.tracker.has(path)) {
 				server.log.error(`file already being uploaded: ${path}`);
-				return await res.status(400).send({ code: 1 });
+				await res.status(400).send({ code: 1 });
+
+				return;
 			}
 
 			await res.status(200).send({ code: 0 });
@@ -65,6 +88,10 @@ export const azureRoutes: FastifyPluginCallback = (server) => {
 					server.tracker.delete(path);
 				}
 			});
+
+			if (server.config.storage.autoCleanup) {
+				await cleanup(path);
+			}
 		}
 	);
 };

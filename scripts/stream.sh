@@ -24,6 +24,7 @@ QUALITY="size=720x480:rate=30"
 DURATION=":duration=5"
 COUNT="1"
 LOGLEVEL="info"
+RECORD=
 
 ## Help ##
 if [ "$1" = "--help" ]; then
@@ -67,6 +68,10 @@ for i in "$@"; do
 			COUNT="${i#*=}"
 			shift
 			;;
+		--dvr=*)
+			RECORD="dvr=${i#*=}"
+			shift
+			;;
 		--silent)
 			LOGLEVEL="error"
 			shift
@@ -89,7 +94,7 @@ function cmd {
 		-profile:v baseline \
 		-vf format=yuv420p \
 		-flvflags no_duration_filesize \
-		-f flv "rtmp://localhost:1935/$1/$2"
+		-f flv "rtmp://localhost:1935/$1/$2?$RECORD"
 }
 
 cd "$(dirname "$0")"

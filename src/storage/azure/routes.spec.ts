@@ -2,8 +2,10 @@ import { ReadStream } from 'node:fs';
 import { MockBody } from '../../mocks/request.js';
 import { server } from '../../server.js';
 import { azureRoutes } from './routes.js';
-import type { BlockBlobClient, ContainerClient } from '@azure/storage-blob';
 import { RECORDINGS_PATH } from '../../lib/utils/constants.js';
+import type { BlockBlobClient, ContainerClient } from '@azure/storage-blob';
+import { flushPromises } from '../../mocks/utils.js';
+import type { DvrWebhookPayload } from '../../lib/types/srs.js';
 
 const mocks = vi.hoisted(() => {
 	return {
@@ -61,7 +63,7 @@ describe('Azure routes', () => {
 				body
 			});
 
-			await Promise.resolve();
+			await flushPromises();
 
 			expect(response.statusCode).toBe(200);
 			expect(response.json()).toStrictEqual({ code: 0 });
@@ -96,7 +98,7 @@ describe('Azure routes', () => {
 				body
 			});
 
-			await Promise.resolve();
+			await flushPromises();
 
 			expect(response.statusCode).toBe(200);
 			expect(response.json()).toStrictEqual({ code: 0 });
@@ -133,6 +135,12 @@ describe('Azure routes', () => {
 	});
 
 	describe('validation', () => {
+		const body = MockBody({
+			app: 'app_id',
+			stream: 'stream_id',
+			file: '/invalid/recording.flv'
+		});
+
 		it('should fail with invalid body', async () => {
 			const response = await server.inject({
 				method: 'POST',
@@ -150,11 +158,10 @@ describe('Azure routes', () => {
 			const response = await server.inject({
 				method: 'POST',
 				url: '/v1/azure',
-				body: MockBody({
-					app: 'app_id',
-					stream: 'stream_id',
+				body: {
+					...body,
 					file: '/invalid/recording.flv'
-				})
+				} satisfies DvrWebhookPayload
 			});
 
 			expect(response.statusCode).toBe(400);
@@ -167,11 +174,10 @@ describe('Azure routes', () => {
 			const response = await server.inject({
 				method: 'POST',
 				url: '/v1/azure',
-				body: MockBody({
-					app: 'app_id',
-					stream: 'stream_id',
+				body: {
+					...body,
 					file: `${server.config.storage.dataRoot}/recording.txt`
-				})
+				} satisfies DvrWebhookPayload
 			});
 
 			expect(response.statusCode).toBe(400);
@@ -186,17 +192,79 @@ describe('Azure routes', () => {
 			const response = await server.inject({
 				method: 'POST',
 				url: '/v1/azure',
-				body: MockBody({
-					app: 'app_id',
-					stream: 'stream_id',
+				body: {
+					...body,
 					file: `${server.config.storage.dataRoot}/app_id/stream_id/recording.flv`
-				})
+				} satisfies DvrWebhookPayload
 			});
 
 			expect(response.statusCode).toBe(400);
 			expect(response.json()).toStrictEqual({ code: 1 });
 
 			expect(mocks.existsSync).toHaveBeenCalledOnce();
+		});
+	});
+
+	describe('dvr param', () => {
+		const body = MockBody({
+			app: 'app_id',
+			stream: 'stream_id',
+			file: `${server.config.storage.dataRoot}/app_id/stream_id/recording.flv`
+		});
+
+		it('should skip upload with dvr=false', async () => {
+			const response = await server.inject({
+				method: 'POST',
+				url: '/v1/azure',
+				body: {
+					...body,
+					param: '?dvr=false'
+				} satisfies DvrWebhookPayload
+			});
+
+			expect(response.statusCode).toBe(200);
+			expect(response.json()).toStrictEqual({ code: 0 });
+
+			expect(mocks.uploadStream).not.toHaveBeenCalled();
+			expect(mocks.rm).toHaveBeenCalledTimes(1);
+			expect(mocks.rm).toHaveBeenCalledWith(`${RECORDINGS_PATH}/app_id/stream_id/recording.flv`);
+		});
+
+		it('should upload with dvr=true', async () => {
+			const response = await server.inject({
+				method: 'POST',
+				url: '/v1/azure',
+				body: {
+					...body,
+					param: '?dvr=true'
+				} satisfies DvrWebhookPayload
+			});
+
+			await flushPromises();
+
+			expect(response.statusCode).toBe(200);
+			expect(response.json()).toStrictEqual({ code: 0 });
+
+			expect(mocks.uploadStream).toHaveBeenCalledTimes(1);
+			expect(mocks.rm).toHaveBeenCalledTimes(1);
+			expect(mocks.rm).toHaveBeenCalledWith(`${RECORDINGS_PATH}/app_id/stream_id/recording.flv`);
+		});
+
+		it('should skip upload with dvr=undefined', async () => {
+			const response = await server.inject({
+				method: 'POST',
+				url: '/v1/azure',
+				body
+			});
+
+			await flushPromises();
+
+			expect(response.statusCode).toBe(200);
+			expect(response.json()).toStrictEqual({ code: 0 });
+
+			expect(mocks.uploadStream).toHaveBeenCalledTimes(1);
+			expect(mocks.rm).toHaveBeenCalledTimes(1);
+			expect(mocks.rm).toHaveBeenCalledWith(`${RECORDINGS_PATH}/app_id/stream_id/recording.flv`);
 		});
 	});
 });
