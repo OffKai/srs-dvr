@@ -12,3 +12,9 @@ declare module 'fastify' {
 		tracker: Map<string, TrackerEntry>;
 	}
 }
+
+declare module '@fastify/request-context' {
+	interface RequestContextData {
+		path: string;
+	}
+}

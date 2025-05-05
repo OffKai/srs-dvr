@@ -2,6 +2,7 @@ import { fastify } from 'fastify';
 import { DvrWebhookSchema, isDev, isTesting } from './lib/utils/constants.js';
 import { DvrMetrics } from './lib/utils/metrics.js';
 import { loadConfig } from './lib/config/load.js';
+import { fastifyRequestContext } from '@fastify/request-context';
 
 async function buildServer() {
 	const server = fastify({
@@ -34,6 +35,8 @@ async function buildServer() {
 	}
 
 	server.addSchema(DvrWebhookSchema);
+
+	await server.register(fastifyRequestContext);
 
 	return server;
 }

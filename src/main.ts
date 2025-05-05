@@ -34,18 +34,22 @@ const printInfo = (host: string) => {
 
 	server.log.info('');
 	server.log.info('API');
-	server.log.info(`  Environment: ${process.env.NODE_ENV}`);
-	server.log.info(`  Version:     ${APP_VERSION}`);
-	server.log.info(`  Endpoint:    http://${host}:${dvr.port}`);
+	server.log.info(`  Environment:   ${process.env.NODE_ENV}`);
+	server.log.info(`  Version:       ${APP_VERSION}`);
+	server.log.info(`  Endpoint:      http://${host}:${dvr.port}`);
 	server.log.info('Metrics');
-	server.log.info(`  Status:      ${metrics.enabled ? 'enabled' : 'disabled'}`);
-	server.log.info(`  Endpoint:    http://${host}:${metrics.port}/metrics`);
+	server.log.info(`  Status:        ${metrics.enabled ? 'enabled' : 'disabled'}`);
+	server.log.info(`  Endpoint:      http://${host}:${metrics.port}/metrics`);
 	server.log.info('Storage');
-	server.log.info(`  Default:     ${storage.defaultStorage}`);
-	server.log.info(`  Data root:   ${storage.dataRoot}`);
-	server.log.info(`  Auto-clean:  ${storage.autoCleanup ? 'enabled' : 'disabled'}`);
+	server.log.info(`  Default:       ${storage.defaultStorage}`);
+	server.log.info(`  Data root:     ${storage.dataRoot}`);
+	server.log.info(`  Auto-clean:    ${storage.autoCleanup ? 'enabled' : 'disabled'}`);
 	server.log.info('Azure');
-	server.log.info(`  Access tier: ${storage.azure.accessTier}`);
+	server.log.info(`  Access tier:   ${storage.azure.accessTier}`);
+	server.log.info('S3');
+	server.log.info(`  Storage class: ${storage.s3.storageClass}`);
+	server.log.info(`  Region:        ${storage.s3.region}`);
+	server.log.info(`  Mini compat:   ${storage.s3.minio}`);
 	server.log.info('');
 };
 

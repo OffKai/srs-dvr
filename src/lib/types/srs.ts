@@ -2,7 +2,6 @@ export type UploadFunc = (
 	uploadPath: string,
 	filePath: string,
 	options?: {
-		onProgress?: (progress: { bytes: number }) => void;
 		onComplete?: () => void | Promise<void>;
 		onFailure?: () => void | Promise<void>;
 	}
@@ -25,7 +24,7 @@ export type DvrWebhookPayload = {
 	stream_id: string;
 };
 
-export type StorageTypes = 'azure';
+export type StorageTypes = 'azure' | 's3';
 
 export type TrackerEntry = {
 	app: string;

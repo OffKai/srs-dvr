@@ -1,13 +1,11 @@
 import { createReadStream, ReadStream } from 'node:fs';
 import { server } from '../../server.js';
-import { getAzureContainerClient } from './client.js';
 import type { UploadFunc } from '../../lib/types/srs.js';
 import type { BlockBlobUploadStreamOptions } from '@azure/storage-blob';
+import { azureClient } from './client.js';
 
 const BLOCK_BUFFER_SIZE_BYTES = 8 * 1024 * 1024; // 8MB
 const MAX_CONCURRENCY = 5;
-
-const azureClient = await getAzureContainerClient();
 
 /**
  * Upload a file to Azure Blob Storage
@@ -29,18 +27,6 @@ export const azureUpload: UploadFunc = async (uploadPath, filePath, options) => 
 		// 'default' uses the account's access tier setting, so we don't need to set it
 		if (server.config.storage.azure.accessTier !== 'default') {
 			opts.tier = server.config.storage.azure.accessTier;
-		}
-
-		// Don't need to provide a callback if we don't need it
-		if (options?.onProgress) {
-			let progress = 0;
-
-			opts.onProgress = ({ loadedBytes }) => {
-				// `loadedBytes` is the total, we want the diff
-				// ref: https://github.com/Azure/azure-sdk-for-js/blob/92e38f91570ed143982c832361f894aae287db63/sdk/storage/storage-blob/src/Clients.ts#L4398
-				options.onProgress!({ bytes: loadedBytes - progress });
-				progress = loadedBytes;
-			};
 		}
 
 		await blockClient.uploadStream(stream, BLOCK_BUFFER_SIZE_BYTES, MAX_CONCURRENCY, opts);

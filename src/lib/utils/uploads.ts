@@ -53,9 +53,6 @@ export async function restartUploads(): Promise<void> {
 					server.metrics?.upload.attempt.inc({ storage: 'azure' });
 
 					await azureUpload(uploadPath, path, {
-						onProgress: ({ bytes }) => {
-							server.metrics?.upload.bytes.inc({ storage: 'azure' }, bytes);
-						},
 						onComplete: () => {
 							count += 1;
 							server.metrics?.upload.success.inc({ storage: 'azure' });

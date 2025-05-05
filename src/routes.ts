@@ -1,9 +1,9 @@
 import { restartUploads } from './lib/utils/uploads.js';
-import { azureRoutes } from './storage/azure/routes.js';
 import type { FastifyPluginAsync } from 'fastify';
+import { storageRoutes } from './storage/routes.js';
 
 export const routes: FastifyPluginAsync = async (server) => {
-	await server.register(azureRoutes);
+	await server.register(storageRoutes);
 
 	server.get('/ping', async (_, res) => {
 		await res.status(200).send('OK');

@@ -9,9 +9,17 @@ metrics:
 storage:
   autoCleanup: false
   dataRoot: /data
-  defaultStorage: azure
+  defaultStorage: s3
   azure:
     accountName: ${DVR_AZURE_ACCOUNT_NAME}
     accountKey: ${DVR_AZURE_ACCOUNT_KEY}
     containerName: ${DVR_AZURE_CONTAINER_NAME}
     accessTier: default
+  s3:
+    accessKey: ${DVR_S3_ACCESS_KEY}
+    secretKey: ${DVR_S3_SECRET_KEY}
+    bucket: ${DVR_AZURE_CONTAINER_NAME}
+    endpoint: ${DVR_S3_ENDPOINT}
+    region: us-east-1
+    storageClass: DEFAULT
+    minio: true

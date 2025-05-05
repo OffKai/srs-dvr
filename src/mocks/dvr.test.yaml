@@ -15,3 +15,10 @@ storage:
     accountKey: key
     containerName: recordings
     accessTier: hot
+  s3:
+    accessKey: key
+    secretKey: secret
+    bucket: dvr
+    endpoint: http://localhost
+    region: us-east-1
+    storageClass: DEFAULT
