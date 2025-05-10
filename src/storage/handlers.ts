@@ -3,6 +3,7 @@ import type { GenericPreHandler } from '../lib/types/fastify.js';
 import { resolveFilePath, verifyFilePath } from '../lib/utils/fs.js';
 import { server } from '../server.js';
 import { rm } from 'node:fs/promises';
+import { shouldUpload } from '../lib/utils/params.js';
 
 export const storagePreHandlerHook: GenericPreHandler<{ Body: DvrWebhookPayload }> = async (req, res) => {
 	// Send custom response for validation errors
@@ -17,9 +18,7 @@ export const storagePreHandlerHook: GenericPreHandler<{ Body: DvrWebhookPayload 
 		return await res.status(400).send({ code: 1 });
 	}
 
-	// Record by default
-	const params = new URLSearchParams(req.body.param);
-	if (params.get('dvr') === 'false') {
+	if (!shouldUpload(req.body.param)) {
 		await res.status(200).send({ code: 0 });
 
 		if (server.config.storage.autoCleanup) {
