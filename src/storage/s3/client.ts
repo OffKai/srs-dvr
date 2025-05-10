@@ -1,5 +1,6 @@
 import { HeadBucketCommand, S3Client } from '@aws-sdk/client-s3';
 import { server } from '../../server.js';
+import { isTesting } from '../../lib/utils/constants.js';
 
 const { s3 } = server.config.storage;
 
@@ -14,6 +15,10 @@ const client = new S3Client({
 });
 
 export async function getS3Client(): Promise<S3Client> {
+	if (isTesting) {
+		throw new Error('s3 client is not supported in testing mode');
+	}
+
 	try {
 		await client.send(
 			new HeadBucketCommand({

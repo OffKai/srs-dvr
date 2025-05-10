@@ -1,5 +1,6 @@
 import { BlobServiceClient, ContainerClient, StorageSharedKeyCredential } from '@azure/storage-blob';
 import { server } from '../../server.js';
+import { isTesting } from '../../lib/utils/constants.js';
 
 const { azure } = server.config.storage;
 
@@ -17,6 +18,10 @@ const client = new BlobServiceClient(
 );
 
 async function getAzureContainerClient(): Promise<ContainerClient> {
+	if (isTesting) {
+		throw new Error('azure client is not supported in testing mode');
+	}
+
 	const containerClient = client.getContainerClient(azure.containerName);
 
 	const exists = await containerClient.exists();

@@ -1,15 +1,15 @@
 import { ReadStream } from 'node:fs';
 import { MockBody } from '../../mocks/request.js';
 import { server } from '../../server.js';
-import { azureRoutes } from './routes.js';
 import { RECORDINGS_PATH } from '../../lib/utils/constants.js';
-import type { BlockBlobClient, ContainerClient } from '@azure/storage-blob';
 import { flushPromises } from '../../mocks/utils.js';
 import type { DvrWebhookPayload } from '../../lib/types/srs.js';
+import { storagePreHandlerHook } from '../handlers.js';
+import { azureRoutes } from './routes.js';
 
 const mocks = vi.hoisted(() => {
 	return {
-		uploadStream: vi.fn(),
+		azureUpload: vi.fn(),
 		rm: vi.fn(),
 		existsSync: vi.fn(() => true)
 	};
@@ -29,19 +29,15 @@ vi.mock('node:fs', async (og) => {
 	};
 });
 vi.mock('node:fs/promises', () => ({ rm: mocks.rm }));
-vi.mock('./client.js', () => ({
-	// @ts-expect-error - Partial client
-	getAzureContainerClient: vi.fn<() => Partial<ContainerClient>>(() => {
-		return {
-			getBlockBlobClient: vi.fn<() => Partial<BlockBlobClient>>(() => ({
-				uploadStream: mocks.uploadStream
-			}))
-		};
-	})
-}));
+vi.mock('./upload.js', () => {
+	return {
+		azureUpload: mocks.azureUpload
+	};
+});
 
 describe('Azure routes', () => {
 	beforeAll(async () => {
+		server.addHook('preHandler', storagePreHandlerHook);
 		await server.register(azureRoutes);
 	});
 
@@ -68,13 +64,13 @@ describe('Azure routes', () => {
 			expect(response.statusCode).toBe(200);
 			expect(response.json()).toStrictEqual({ code: 0 });
 
-			expect(mocks.uploadStream).toHaveBeenCalledTimes(1);
+			expect(mocks.azureUpload).toHaveBeenCalledTimes(1);
 			expect(mocks.rm).toHaveBeenCalledTimes(1);
 			expect(mocks.rm).toHaveBeenCalledWith(`${RECORDINGS_PATH}/app_id/stream_id/recording.flv`);
 		});
 
-		test('uploadStream throws error', async () => {
-			mocks.uploadStream.mockRejectedValueOnce(new Error());
+		test('azureUpload throws error', async () => {
+			mocks.azureUpload.mockRejectedValueOnce(new Error());
 
 			const response = await server.inject({
 				method: 'POST',
@@ -85,7 +81,7 @@ describe('Azure routes', () => {
 			expect(response.statusCode).toBe(200);
 			expect(response.json()).toStrictEqual({ code: 0 });
 
-			expect(mocks.uploadStream).toHaveBeenCalledTimes(1);
+			expect(mocks.azureUpload).toHaveBeenCalledTimes(1);
 			expect(mocks.rm).not.toHaveBeenCalled();
 		});
 
@@ -103,7 +99,7 @@ describe('Azure routes', () => {
 			expect(response.statusCode).toBe(200);
 			expect(response.json()).toStrictEqual({ code: 0 });
 
-			expect(mocks.uploadStream).toHaveBeenCalledTimes(1);
+			expect(mocks.azureUpload).toHaveBeenCalledTimes(1);
 			expect(mocks.rm).toHaveBeenCalledTimes(1);
 			expect(mocks.rm).toHaveBeenCalledWith(`${RECORDINGS_PATH}/app_id/stream_id/recording.flv`);
 			await expect(mocks.rm).rejects.toThrow();
@@ -225,7 +221,7 @@ describe('Azure routes', () => {
 			expect(response.statusCode).toBe(200);
 			expect(response.json()).toStrictEqual({ code: 0 });
 
-			expect(mocks.uploadStream).not.toHaveBeenCalled();
+			expect(mocks.azureUpload).not.toHaveBeenCalled();
 			expect(mocks.rm).toHaveBeenCalledTimes(1);
 			expect(mocks.rm).toHaveBeenCalledWith(`${RECORDINGS_PATH}/app_id/stream_id/recording.flv`);
 		});
@@ -245,7 +241,7 @@ describe('Azure routes', () => {
 			expect(response.statusCode).toBe(200);
 			expect(response.json()).toStrictEqual({ code: 0 });
 
-			expect(mocks.uploadStream).toHaveBeenCalledTimes(1);
+			expect(mocks.azureUpload).toHaveBeenCalledTimes(1);
 			expect(mocks.rm).toHaveBeenCalledTimes(1);
 			expect(mocks.rm).toHaveBeenCalledWith(`${RECORDINGS_PATH}/app_id/stream_id/recording.flv`);
 		});
@@ -262,7 +258,7 @@ describe('Azure routes', () => {
 			expect(response.statusCode).toBe(200);
 			expect(response.json()).toStrictEqual({ code: 0 });
 
-			expect(mocks.uploadStream).toHaveBeenCalledTimes(1);
+			expect(mocks.azureUpload).toHaveBeenCalledTimes(1);
 			expect(mocks.rm).toHaveBeenCalledTimes(1);
 			expect(mocks.rm).toHaveBeenCalledWith(`${RECORDINGS_PATH}/app_id/stream_id/recording.flv`);
 		});

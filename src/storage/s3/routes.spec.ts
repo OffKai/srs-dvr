@@ -1,24 +1,40 @@
-import type { S3Client } from '@aws-sdk/client-s3';
 import { MockBody } from '../../mocks/request.js';
 import { server } from '../../server.js';
 import { s3Routes } from './routes.js';
+import { storagePreHandlerHook } from '../handlers.js';
+import { ReadStream } from 'node:fs';
 
 const mocks = vi.hoisted(() => {
 	return {
-		send: vi.fn()
+		s3Upload: vi.fn(),
+		rm: vi.fn(),
+		existsSync: vi.fn(() => true)
 	};
 });
 
-vi.mock('./client.js', () => ({
-	getS3Client: vi.fn<() => Partial<S3Client>>(() => {
-		return {
-			send: mocks.send
-		};
-	})
+vi.mock('node:timers', () => ({
+	setTimeout: vi.fn((fn) => fn()),
+	setImmediate: vi.fn((fn) => fn())
 }));
+vi.mock('node:process', () => ({ loadEnvFile: vi.fn() }));
+vi.mock('node:fs', async (og) => {
+	const fs = await og<typeof import('node:fs')>();
+	return {
+		ReadStream: fs.ReadStream,
+		createReadStream: vi.fn(() => ReadStream.from([])),
+		existsSync: mocks.existsSync
+	};
+});
+vi.mock('node:fs/promises', () => ({ rm: mocks.rm }));
+vi.mock('./upload.js', () => {
+	return {
+		s3Upload: mocks.s3Upload
+	};
+});
 
 describe('S3 routes', () => {
 	beforeAll(async () => {
+		server.addHook('preHandler', storagePreHandlerHook);
 		await server.register(s3Routes);
 	});
 

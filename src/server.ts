@@ -1,5 +1,5 @@
 import { fastify } from 'fastify';
-import { DvrWebhookSchema, isDev, isTesting } from './lib/utils/constants.js';
+import { DvrWebhookSchema, isDev } from './lib/utils/constants.js';
 import { DvrMetrics } from './lib/utils/metrics.js';
 import { loadConfig } from './lib/config/load.js';
 import { fastifyRequestContext } from '@fastify/request-context';
@@ -8,11 +8,9 @@ async function buildServer() {
 	const server = fastify({
 		disableRequestLogging: !isDev,
 		logger: {
-			level: isTesting //
-				? 'silent'
-				: isDev
-					? 'debug'
-					: 'info',
+			level: isDev //
+				? 'debug'
+				: 'info',
 			transport: {
 				target: 'pino-pretty',
 				options: {
