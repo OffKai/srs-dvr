@@ -102,6 +102,21 @@ dvr:
   port: ${DVR_PORT} # resolves to: 4000
 ```
 
+### Query parameters
+
+It is also possible to change how the DVR handles webhooks depending on the query params appended to your SRS ingest URL.
+
+Example:
+
+```
+rtmp://localhost:1935/app/stream?dvr=true&start=1746915970
+```
+
+| Query param | Description                                                                                                                                                                               |
+| ----------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `dvr`       | Setting this to `false` will disable all uploads, any other value will allow it. Files are still removed.                                                                                 |
+| `start`     | A [Unix timestamp](https://www.unixtimestamp.com/) of when the DVR is allowed to start uploading files. Any webhook request _before_ this time will get dropped. Files are still removed. |
+
 ## Contributing
 
 ### Tools

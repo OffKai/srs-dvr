@@ -246,7 +246,7 @@ describe('S3 routes', () => {
 			expect(mocks.rm).toHaveBeenCalledWith(`${RECORDINGS_PATH}/app_id/stream_id/recording.flv`);
 		});
 
-		it('should skip upload with dvr=undefined', async () => {
+		it('should skip upload with dvr=null', async () => {
 			const response = await server.inject({
 				method: 'POST',
 				url: '/v1/s3',
