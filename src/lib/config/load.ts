@@ -25,6 +25,15 @@ export async function loadConfig(): Promise<DvrConfig> {
 					accountKey: 'key',
 					containerName: 'test',
 					accessTier: 'hot'
+				},
+				s3: {
+					accessKey: 'access_key',
+					secretKey: 'secret_key',
+					bucket: 'bucket',
+					endpoint: 'http://localhost',
+					region: 'region',
+					storageClass: 'STANDARD',
+					minio: true
 				}
 			}
 		} satisfies Unvalidated<DvrConfig>);

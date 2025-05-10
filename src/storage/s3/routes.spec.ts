@@ -1,15 +1,15 @@
-import { ReadStream } from 'node:fs';
 import { MockBody } from '../../mocks/request.js';
 import { server } from '../../server.js';
-import { RECORDINGS_PATH } from '../../lib/utils/constants.js';
-import { flushPromises } from '../../mocks/utils.js';
-import type { DvrWebhookPayload } from '../../lib/types/srs.js';
+import { s3Routes } from './routes.js';
 import { storagePreHandlerHook } from '../handlers.js';
-import { azureRoutes } from './routes.js';
+import { ReadStream } from 'node:fs';
+import { flushPromises } from '../../mocks/utils.js';
+import { RECORDINGS_PATH } from '../../lib/utils/constants.js';
+import type { DvrWebhookPayload } from '../../lib/types/srs.js';
 
 const mocks = vi.hoisted(() => {
 	return {
-		azureUpload: vi.fn(),
+		s3Upload: vi.fn(),
 		rm: vi.fn(),
 		existsSync: vi.fn(() => true)
 	};
@@ -31,14 +31,14 @@ vi.mock('node:fs', async (og) => {
 vi.mock('node:fs/promises', () => ({ rm: mocks.rm }));
 vi.mock('./upload.js', () => {
 	return {
-		azureUpload: mocks.azureUpload
+		s3Upload: mocks.s3Upload
 	};
 });
 
-describe('Azure routes', () => {
+describe('S3 routes', () => {
 	beforeAll(async () => {
 		server.addHook('preHandler', storagePreHandlerHook);
-		await server.register(azureRoutes);
+		await server.register(s3Routes);
 	});
 
 	beforeEach(() => {
@@ -55,7 +55,7 @@ describe('Azure routes', () => {
 		it('should upload file', async () => {
 			const response = await server.inject({
 				method: 'POST',
-				url: '/v1/azure',
+				url: '/v1/s3',
 				body
 			});
 
@@ -64,24 +64,24 @@ describe('Azure routes', () => {
 			expect(response.statusCode).toBe(200);
 			expect(response.json()).toStrictEqual({ code: 0 });
 
-			expect(mocks.azureUpload).toHaveBeenCalledTimes(1);
+			expect(mocks.s3Upload).toHaveBeenCalledTimes(1);
 			expect(mocks.rm).toHaveBeenCalledTimes(1);
 			expect(mocks.rm).toHaveBeenCalledWith(`${RECORDINGS_PATH}/app_id/stream_id/recording.flv`);
 		});
 
-		test('azureUpload throws error', async () => {
-			mocks.azureUpload.mockRejectedValueOnce(new Error());
+		test('s3Upload throws error', async () => {
+			mocks.s3Upload.mockRejectedValueOnce(new Error());
 
 			const response = await server.inject({
 				method: 'POST',
-				url: '/v1/azure',
+				url: '/v1/s3',
 				body
 			});
 
 			expect(response.statusCode).toBe(200);
 			expect(response.json()).toStrictEqual({ code: 0 });
 
-			expect(mocks.azureUpload).toHaveBeenCalledTimes(1);
+			expect(mocks.s3Upload).toHaveBeenCalledTimes(1);
 			expect(mocks.rm).not.toHaveBeenCalled();
 		});
 
@@ -90,7 +90,7 @@ describe('Azure routes', () => {
 
 			const response = await server.inject({
 				method: 'POST',
-				url: '/v1/azure',
+				url: '/v1/s3',
 				body
 			});
 
@@ -99,7 +99,7 @@ describe('Azure routes', () => {
 			expect(response.statusCode).toBe(200);
 			expect(response.json()).toStrictEqual({ code: 0 });
 
-			expect(mocks.azureUpload).toHaveBeenCalledTimes(1);
+			expect(mocks.s3Upload).toHaveBeenCalledTimes(1);
 			expect(mocks.rm).toHaveBeenCalledTimes(1);
 			expect(mocks.rm).toHaveBeenCalledWith(`${RECORDINGS_PATH}/app_id/stream_id/recording.flv`);
 			await expect(mocks.rm).rejects.toThrow();
@@ -112,7 +112,7 @@ describe('Azure routes', () => {
 
 			const resOne = await server.inject({
 				method: 'POST',
-				url: '/v1/azure',
+				url: '/v1/s3',
 				body
 			});
 
@@ -121,7 +121,7 @@ describe('Azure routes', () => {
 
 			const resTwo = await server.inject({
 				method: 'POST',
-				url: '/v1/azure',
+				url: '/v1/s3',
 				body
 			});
 
@@ -140,7 +140,7 @@ describe('Azure routes', () => {
 		it('should fail with invalid body', async () => {
 			const response = await server.inject({
 				method: 'POST',
-				url: '/v1/azure',
+				url: '/v1/s3',
 				body: {
 					key: 'value'
 				}
@@ -153,7 +153,7 @@ describe('Azure routes', () => {
 		it('should fail with invalid path root', async () => {
 			const response = await server.inject({
 				method: 'POST',
-				url: '/v1/azure',
+				url: '/v1/s3',
 				body: {
 					...body,
 					file: '/invalid/recording.flv'
@@ -169,7 +169,7 @@ describe('Azure routes', () => {
 		it('should fail with invalid file extension', async () => {
 			const response = await server.inject({
 				method: 'POST',
-				url: '/v1/azure',
+				url: '/v1/s3',
 				body: {
 					...body,
 					file: `${server.config.storage.dataRoot}/recording.txt`
@@ -187,7 +187,7 @@ describe('Azure routes', () => {
 
 			const response = await server.inject({
 				method: 'POST',
-				url: '/v1/azure',
+				url: '/v1/s3',
 				body: {
 					...body,
 					file: `${server.config.storage.dataRoot}/app_id/stream_id/recording.flv`
@@ -211,7 +211,7 @@ describe('Azure routes', () => {
 		it('should skip upload with dvr=false', async () => {
 			const response = await server.inject({
 				method: 'POST',
-				url: '/v1/azure',
+				url: '/v1/s3',
 				body: {
 					...body,
 					param: '?dvr=false'
@@ -221,7 +221,7 @@ describe('Azure routes', () => {
 			expect(response.statusCode).toBe(200);
 			expect(response.json()).toStrictEqual({ code: 0 });
 
-			expect(mocks.azureUpload).not.toHaveBeenCalled();
+			expect(mocks.s3Upload).not.toHaveBeenCalled();
 			expect(mocks.rm).toHaveBeenCalledTimes(1);
 			expect(mocks.rm).toHaveBeenCalledWith(`${RECORDINGS_PATH}/app_id/stream_id/recording.flv`);
 		});
@@ -229,7 +229,7 @@ describe('Azure routes', () => {
 		it('should upload with dvr=true', async () => {
 			const response = await server.inject({
 				method: 'POST',
-				url: '/v1/azure',
+				url: '/v1/s3',
 				body: {
 					...body,
 					param: '?dvr=true'
@@ -241,7 +241,7 @@ describe('Azure routes', () => {
 			expect(response.statusCode).toBe(200);
 			expect(response.json()).toStrictEqual({ code: 0 });
 
-			expect(mocks.azureUpload).toHaveBeenCalledTimes(1);
+			expect(mocks.s3Upload).toHaveBeenCalledTimes(1);
 			expect(mocks.rm).toHaveBeenCalledTimes(1);
 			expect(mocks.rm).toHaveBeenCalledWith(`${RECORDINGS_PATH}/app_id/stream_id/recording.flv`);
 		});
@@ -249,7 +249,7 @@ describe('Azure routes', () => {
 		it('should skip upload with dvr=undefined', async () => {
 			const response = await server.inject({
 				method: 'POST',
-				url: '/v1/azure',
+				url: '/v1/s3',
 				body
 			});
 
@@ -258,7 +258,7 @@ describe('Azure routes', () => {
 			expect(response.statusCode).toBe(200);
 			expect(response.json()).toStrictEqual({ code: 0 });
 
-			expect(mocks.azureUpload).toHaveBeenCalledTimes(1);
+			expect(mocks.s3Upload).toHaveBeenCalledTimes(1);
 			expect(mocks.rm).toHaveBeenCalledTimes(1);
 			expect(mocks.rm).toHaveBeenCalledWith(`${RECORDINGS_PATH}/app_id/stream_id/recording.flv`);
 		});

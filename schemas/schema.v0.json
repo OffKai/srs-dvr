@@ -44,7 +44,7 @@
 				},
 				"defaultStorage": {
 					"type": "string",
-					"enum": ["azure"],
+					"enum": ["azure", "s3"],
 					"description": "Default storage provider to use"
 				},
 				"azure": {
@@ -72,9 +72,54 @@
 					"required": ["accountName", "accountKey", "containerName"],
 					"additionalProperties": false,
 					"description": "Settings for Azure Blob Storage"
+				},
+				"s3": {
+					"type": "object",
+					"properties": {
+						"accessKey": {
+							"type": "string"
+						},
+						"secretKey": {
+							"type": "string"
+						},
+						"bucket": {
+							"type": "string"
+						},
+						"endpoint": {
+							"type": "string"
+						},
+						"region": {
+							"type": "string"
+						},
+						"storageClass": {
+							"type": "string",
+							"enum": [
+								"DEFAULT",
+								"STANDARD",
+								"REDUCED_REDUNDANCY",
+								"STANDARD_IA",
+								"ONEZONE_IA",
+								"INTELLIGENT_TIERING",
+								"GLACIER",
+								"DEEP_ARCHIVE",
+								"OUTPOSTS",
+								"GLACIER_IR",
+								"SNOW",
+								"EXPRESS_ONEZONE"
+							],
+							"default": "DEFAULT"
+						},
+						"minio": {
+							"type": "boolean",
+							"default": false
+						}
+					},
+					"required": ["accessKey", "secretKey", "bucket", "endpoint", "region"],
+					"additionalProperties": false,
+					"description": "Settings for S3-compatible storage"
 				}
 			},
-			"required": ["dataRoot", "defaultStorage", "azure"],
+			"required": ["dataRoot", "defaultStorage", "azure", "s3"],
 			"additionalProperties": false,
 			"description": "Settings for storage"
 		}

@@ -1,9 +1,10 @@
 import { BlobServiceClient, ContainerClient, StorageSharedKeyCredential } from '@azure/storage-blob';
 import { server } from '../../server.js';
+import { isTesting } from '../../lib/utils/constants.js';
 
 const { azure } = server.config.storage;
 
-const blobClient = new BlobServiceClient(
+const client = new BlobServiceClient(
 	`https://${azure.accountName}.blob.core.windows.net`, //
 	new StorageSharedKeyCredential(azure.accountName, azure.accountKey),
 	{
@@ -16,8 +17,12 @@ const blobClient = new BlobServiceClient(
 	}
 );
 
-export async function getAzureContainerClient(): Promise<ContainerClient> {
-	const containerClient = blobClient.getContainerClient(azure.containerName);
+async function getAzureContainerClient(): Promise<ContainerClient> {
+	if (isTesting) {
+		throw new Error('azure client is not supported in testing mode');
+	}
+
+	const containerClient = client.getContainerClient(azure.containerName);
 
 	const exists = await containerClient.exists();
 	if (!exists) {
@@ -26,3 +31,5 @@ export async function getAzureContainerClient(): Promise<ContainerClient> {
 
 	return containerClient;
 }
+
+export const azureClient = await getAzureContainerClient();

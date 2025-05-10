@@ -42,7 +42,7 @@ Config path: `/etc/dvr/dvr.config.yaml`
 
 - Values with angle brackets are required (ie `<string>`).
 - Values with square brackets are optional (ie `[string]`).
-- Default values are noted after the equals sign (ie default for `<string=test>` is `test`).
+- Default values are noted after the equals sign (ie default for `[string=test]` is `test`).
 
 ```yaml
 dvr:
@@ -64,7 +64,7 @@ storage:
   #     /other/path/[app]/[stream]/[timestamp].flv; -> /other/path
   dataRoot: <string>
   # Default storage provider to use
-  defaultStorage: <enum> # one of: azure
+  defaultStorage: <enum> # one of: azure, s3
   azure:
     # Azure Blob Storage account name
     accountName: <string>
@@ -75,11 +75,21 @@ storage:
     # Access tier for uploaded files
     # reference: https://learn.microsoft.com/en-us/azure/storage/blobs/access-tiers-overview
     accessTier: [enum=default] # one of: default, hot, cool, cold, archive
+  s3:
+    accessKey: <string>
+    secretKey: <string>
+    bucket: <string>
+    endpoint: <string>
+    region: <string>
+    # Storage class for uploaded files
+    storageClass: [enum=DEFAULT] # one of: DEFAULT, STANDARD, REDUCED_REDUNDANCY, STANDARD_IA, ONEZONE_IA, INTELLIGENT_TIERING, GLACIER, DEEP_ARCHIVE, OUTPOSTS, GLACIER_IR, SNOW, EXPRESS_ONEZONE
+    # If compatibility options for MinIO should be enabled
+    minio: true
 ```
 
 ### Env var substitution
 
-The config file also supports environment variable substitution, which is showcased below.
+The config file also supports basic environment variable substitution, which is showcased below.
 
 ```sh
 # .env

@@ -48,6 +48,11 @@ describe('parser', () => {
 			vi.stubEnv('DVR_AZURE_ACCOUNT_NAME', 'account_name');
 			vi.stubEnv('DVR_AZURE_ACCOUNT_KEY', 'account_key');
 			vi.stubEnv('DVR_AZURE_CONTAINER_NAME', 'container');
+			vi.stubEnv('DVR_S3_ACCESS_KEY', 'access_key');
+			vi.stubEnv('DVR_S3_SECRET_KEY', 'secret_key');
+			vi.stubEnv('DVR_S3_BUCKET', 'bucket');
+			vi.stubEnv('DVR_S3_ENDPOINT', 'endpoint');
+			vi.stubEnv('DVR_S3_REGION', 'us-east-1');
 
 			const result = hydrateYaml({
 				dvr: {
@@ -66,6 +71,15 @@ describe('parser', () => {
 						accountKey: '${DVR_AZURE_ACCOUNT_KEY}',
 						containerName: '${DVR_AZURE_CONTAINER_NAME}',
 						accessTier: 'default'
+					},
+					s3: {
+						accessKey: '${DVR_S3_ACCESS_KEY}',
+						secretKey: '${DVR_S3_SECRET_KEY}',
+						bucket: '${DVR_S3_BUCKET}',
+						endpoint: '${DVR_S3_ENDPOINT}',
+						region: '${DVR_S3_REGION}',
+						storageClass: 'STANDARD',
+						minio: true
 					}
 				}
 			} satisfies Unvalidated<DvrConfig>);
@@ -87,6 +101,15 @@ describe('parser', () => {
 						accountKey: 'account_key',
 						containerName: 'container',
 						accessTier: 'default'
+					},
+					s3: {
+						accessKey: 'access_key',
+						secretKey: 'secret_key',
+						bucket: 'bucket',
+						endpoint: 'endpoint',
+						region: 'us-east-1',
+						storageClass: 'STANDARD',
+						minio: true
 					}
 				}
 			} satisfies DvrConfig);

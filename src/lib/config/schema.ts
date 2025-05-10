@@ -1,6 +1,55 @@
 import { z } from 'zod';
 import type { StorageTypes } from '../types/srs.js';
 
+const AzureSchema = z
+	.object({
+		/** Azure Blob Storage account name. */
+		accountName: z //
+			.string()
+			.describe('Azure Blob Storage account name'),
+		/** Azure Blob Storage account key. */
+		accountKey: z //
+			.string()
+			.describe('Azure Blob Storage account key'),
+		/** Azure Blob Storage container to upload to. */
+		containerName: z //
+			.string()
+			.describe('Azure Blob Storage container to upload to'),
+		/** Access tier for uploaded files. `default` uses the default access tier set on the account. */
+		accessTier: z //
+			.enum(['default', 'hot', 'cool', 'cold', 'archive'])
+			.default('default')
+			.describe('Access tier for uploaded files. `default` uses the default access tier set on the account.')
+	})
+	.describe('Settings for Azure Blob Storage');
+
+const S3Schema = z
+	.object({
+		accessKey: z.string(),
+		secretKey: z.string(),
+		bucket: z.string(),
+		endpoint: z.string(),
+		region: z.string(),
+		storageClass: z //
+			.enum([
+				'DEFAULT',
+				'STANDARD',
+				'REDUCED_REDUNDANCY',
+				'STANDARD_IA',
+				'ONEZONE_IA',
+				'INTELLIGENT_TIERING',
+				'GLACIER',
+				'DEEP_ARCHIVE',
+				'OUTPOSTS',
+				'GLACIER_IR',
+				'SNOW',
+				'EXPRESS_ONEZONE'
+			])
+			.default('DEFAULT'),
+		minio: z.boolean().default(false)
+	})
+	.describe('Settings for S3-compatible storage');
+
 export const DvrConfigSchema = z
 	.object({
 		/** General settings */
@@ -54,30 +103,11 @@ export const DvrConfigSchema = z
 					.describe('Root directory that recordings are stored in'),
 				/** Default storage provider to use. */
 				defaultStorage: z //
-					.enum<StorageTypes, [StorageTypes, ...StorageTypes[]]>(['azure'])
+					.enum<StorageTypes, [StorageTypes, ...StorageTypes[]]>(['azure', 's3'])
 					.describe('Default storage provider to use'),
 				/** Settings for Azure Blob Storage */
-				azure: z
-					.object({
-						/** Azure Blob Storage account name. */
-						accountName: z //
-							.string()
-							.describe('Azure Blob Storage account name'),
-						/** Azure Blob Storage account key. */
-						accountKey: z //
-							.string()
-							.describe('Azure Blob Storage account key'),
-						/** Azure Blob Storage container to upload to. */
-						containerName: z //
-							.string()
-							.describe('Azure Blob Storage container to upload to'),
-						/** Access tier for uploaded files. `default` uses the default access tier set on the account. */
-						accessTier: z //
-							.enum(['default', 'hot', 'cool', 'cold', 'archive'])
-							.default('default')
-							.describe('Access tier for uploaded files. `default` uses the default access tier set on the account.')
-					})
-					.describe('Settings for Azure Blob Storage')
+				azure: AzureSchema,
+				s3: S3Schema
 			})
 			.describe('Settings for storage')
 	})

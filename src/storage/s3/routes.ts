@@ -1,14 +1,14 @@
-import { azureUpload } from './upload.js';
-import { fmtUploadPath } from '../../lib/utils/fs.js';
 import { DvrWebhookSchema } from '../../lib/utils/constants.js';
 import { basename } from 'node:path';
-import { rm } from 'node:fs/promises';
 import type { FastifyPluginCallback } from 'fastify';
 import type { DvrWebhookPayload, TrackerEntry } from '../../lib/types/srs.js';
+import { fmtUploadPath } from '../../lib/utils/fs.js';
+import { rm } from 'node:fs/promises';
+import { s3Upload } from './upload.js';
 
-export const azureRoutes: FastifyPluginCallback = (server) => {
+export const s3Routes: FastifyPluginCallback = (server) => {
 	server.post<{ Body: DvrWebhookPayload }>(
-		'/v1/azure',
+		'/v1/s3',
 		{
 			schema: { body: { $ref: DvrWebhookSchema.$id } },
 			attachValidation: true
@@ -27,7 +27,7 @@ export const azureRoutes: FastifyPluginCallback = (server) => {
 				stream: req.body.stream,
 				filename: basename(path),
 				path,
-				storage: 'azure',
+				storage: 's3',
 				date: new Date().toISOString()
 			};
 
@@ -39,15 +39,15 @@ export const azureRoutes: FastifyPluginCallback = (server) => {
 				filename: recording.filename
 			});
 
-			server.metrics?.upload.attempt.inc({ storage: 'azure' });
+			server.metrics?.upload.attempt.inc({ storage: 's3' });
 
-			await azureUpload(uploadPath, path, {
+			await s3Upload(uploadPath, path, {
 				onComplete: () => {
-					server.metrics?.upload.success.inc({ storage: 'azure' });
+					server.metrics?.upload.success.inc({ storage: 's3' });
 					server.tracker.delete(path);
 				},
 				onFailure: () => {
-					server.metrics?.upload.failure.inc({ storage: 'azure' });
+					server.metrics?.upload.failure.inc({ storage: 's3' });
 					server.tracker.delete(path);
 				}
 			});
