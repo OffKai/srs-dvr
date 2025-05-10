@@ -42,7 +42,7 @@ Config path: `/etc/dvr/dvr.config.yaml`
 
 - Values with angle brackets are required (ie `<string>`).
 - Values with square brackets are optional (ie `[string]`).
-- Default values are noted after the equals sign (ie default for `<string=test>` is `test`).
+- Default values are noted after the equals sign (ie default for `[string=test]` is `test`).
 
 ```yaml
 dvr:
