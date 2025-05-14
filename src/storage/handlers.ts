@@ -19,6 +19,7 @@ export const storagePreHandlerHook: GenericPreHandler<{ Body: DvrWebhookPayload 
 	}
 
 	if (!shouldUpload(req.body.param)) {
+		server.log.info(`skipping upload for file: ${path}`);
 		await res.status(200).send({ code: 0 });
 
 		if (server.config.storage.autoCleanup) {

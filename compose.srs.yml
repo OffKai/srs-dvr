@@ -6,6 +6,11 @@ services:
       SRS_CONFIG_FILE: /opt/conf/origin.conf
       SRS_VHOST_HTTP_HOOKS_ON_DVR: http://localhost:3001/v1/s3
       SRS_EXPORTER_ENABLED: on
+      # SRS_HTTP_API_AUTH_PASSWORD: 123456
+      # SRS_VHOST_HTTP_HOOKS_ON_PUBLISH: http://localhost:3005/hook/streams
+      # SRS_VHOST_HTTP_HOOKS_ON_UNPUBLISH: http://localhost:3005/hook/streams
+      # SRS_VHOST_HTTP_HOOKS_ON_PLAY: http://localhost:3005/hook/sessions
+      # SRS_VHOST_HTTP_HOOKS_ON_STOP: http://localhost:3005/hook/sessions
     env_file:
       - .env
     network_mode: host # Need to send webhooks to localhost
