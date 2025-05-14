@@ -49,7 +49,7 @@ const printInfo = (host: string) => {
 	server.log.info('S3');
 	server.log.info(`  Storage class: ${storage.s3.storageClass}`);
 	server.log.info(`  Region:        ${storage.s3.region}`);
-	server.log.info(`  Mini compat:   ${storage.s3.minio}`);
+	server.log.info(`  MinIO compat:   ${storage.s3.minio}`);
 	server.log.info('');
 };
 
