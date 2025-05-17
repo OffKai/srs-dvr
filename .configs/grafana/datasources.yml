@@ -14,4 +14,4 @@ datasources:
     jsonData:
       httpMethod: POST
       prometheusType: Prometheus
-      prometheusVersion: 3.1.0
+      prometheusVersion: 3.4.0

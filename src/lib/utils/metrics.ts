@@ -77,11 +77,6 @@ const upload = {
 		help: 'Count of upload failures',
 		labelNames: ['storage']
 	}),
-	bytes: new Counter({
-		name: 'dvr_upload_byte_count',
-		help: 'Count of bytes uploaded',
-		labelNames: ['storage']
-	}),
 	inprogress: new Gauge({
 		name: 'dvr_upload_inprogress_total',
 		help: 'Gauge of uploads in progress',

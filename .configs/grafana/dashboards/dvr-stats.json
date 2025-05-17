@@ -36,79 +36,6 @@
 						"mode": "absolute",
 						"steps": [
 							{
-								"color": "red"
-							},
-							{
-								"color": "#EAB839",
-								"value": 95
-							},
-							{
-								"color": "green",
-								"value": 99
-							}
-						]
-					},
-					"unit": "percent"
-				},
-				"overrides": []
-			},
-			"gridPos": {
-				"h": 5,
-				"w": 5,
-				"x": 0,
-				"y": 0
-			},
-			"id": 4,
-			"options": {
-				"minVizHeight": 75,
-				"minVizWidth": 75,
-				"orientation": "auto",
-				"reduceOptions": {
-					"calcs": ["lastNotNull"],
-					"fields": "",
-					"values": false
-				},
-				"showThresholdLabels": false,
-				"showThresholdMarkers": true,
-				"sizing": "auto"
-			},
-			"pluginVersion": "11.6.0",
-			"targets": [
-				{
-					"datasource": {
-						"type": "prometheus",
-						"uid": "Q0WJOQ3FF3HET6FH"
-					},
-					"disableTextWrap": false,
-					"editorMode": "code",
-					"expr": "(sum(dvr_upload_success_count > 0) or vector(0))\r\n  /\r\nsum(dvr_upload_attempt_count > 0) * 100",
-					"fullMetaSearch": false,
-					"includeNullMetadata": true,
-					"instant": false,
-					"legendFormat": "__auto",
-					"range": true,
-					"refId": "A",
-					"useBackend": false
-				}
-			],
-			"title": "Upload success rate",
-			"type": "gauge"
-		},
-		{
-			"datasource": {
-				"type": "prometheus",
-				"uid": "Q0WJOQ3FF3HET6FH"
-			},
-			"fieldConfig": {
-				"defaults": {
-					"color": {
-						"mode": "thresholds"
-					},
-					"mappings": [],
-					"thresholds": {
-						"mode": "absolute",
-						"steps": [
-							{
 								"color": "green"
 							},
 							{
@@ -123,7 +50,7 @@
 			"gridPos": {
 				"h": 5,
 				"w": 4,
-				"x": 5,
+				"x": 0,
 				"y": 0
 			},
 			"id": 5,
@@ -142,7 +69,7 @@
 				"textMode": "auto",
 				"wideLayout": true
 			},
-			"pluginVersion": "11.6.0",
+			"pluginVersion": "12.0.0",
 			"targets": [
 				{
 					"datasource": {
@@ -165,6 +92,19 @@
 			"type": "stat"
 		},
 		{
+			"collapsed": false,
+			"gridPos": {
+				"h": 1,
+				"w": 24,
+				"x": 0,
+				"y": 5
+			},
+			"id": 10,
+			"panels": [],
+			"title": "Azure",
+			"type": "row"
+		},
+		{
 			"datasource": {
 				"type": "prometheus",
 				"uid": "Q0WJOQ3FF3HET6FH"
@@ -179,37 +119,43 @@
 						"mode": "absolute",
 						"steps": [
 							{
-								"color": "green"
+								"color": "red"
+							},
+							{
+								"color": "#EAB839",
+								"value": 95
+							},
+							{
+								"color": "green",
+								"value": 99
 							}
 						]
 					},
-					"unit": "Bps"
+					"unit": "percent"
 				},
 				"overrides": []
 			},
 			"gridPos": {
-				"h": 5,
-				"w": 4,
-				"x": 9,
-				"y": 0
+				"h": 4,
+				"w": 3,
+				"x": 0,
+				"y": 6
 			},
-			"id": 7,
+			"id": 4,
 			"options": {
-				"colorMode": "value",
-				"graphMode": "area",
-				"justifyMode": "auto",
+				"minVizHeight": 75,
+				"minVizWidth": 75,
 				"orientation": "auto",
-				"percentChangeColorMode": "standard",
 				"reduceOptions": {
 					"calcs": ["lastNotNull"],
 					"fields": "",
 					"values": false
 				},
-				"showPercentChange": false,
-				"textMode": "auto",
-				"wideLayout": true
+				"showThresholdLabels": false,
+				"showThresholdMarkers": true,
+				"sizing": "auto"
 			},
-			"pluginVersion": "11.6.0",
+			"pluginVersion": "12.0.0",
 			"targets": [
 				{
 					"datasource": {
@@ -218,7 +164,7 @@
 					},
 					"disableTextWrap": false,
 					"editorMode": "code",
-					"expr": "rate(dvr_upload_byte_count[1m])",
+					"expr": "(sum(dvr_upload_success_count{storage=\"azure\"} > 0) or vector(0))\r\n  /\r\nsum(dvr_upload_attempt_count{storage=\"azure\"} > 0) * 100",
 					"fullMetaSearch": false,
 					"includeNullMetadata": true,
 					"instant": false,
@@ -228,113 +174,8 @@
 					"useBackend": false
 				}
 			],
-			"title": "Upload speed",
-			"type": "stat"
-		},
-		{
-			"datasource": {
-				"type": "prometheus",
-				"uid": "Q0WJOQ3FF3HET6FH"
-			},
-			"fieldConfig": {
-				"defaults": {
-					"color": {
-						"mode": "palette-classic"
-					},
-					"custom": {
-						"axisBorderShow": false,
-						"axisCenteredZero": false,
-						"axisColorMode": "text",
-						"axisLabel": "",
-						"axisPlacement": "auto",
-						"barAlignment": 0,
-						"barWidthFactor": 0.6,
-						"drawStyle": "line",
-						"fillOpacity": 0,
-						"gradientMode": "none",
-						"hideFrom": {
-							"legend": false,
-							"tooltip": false,
-							"viz": false
-						},
-						"insertNulls": false,
-						"lineInterpolation": "linear",
-						"lineStyle": {
-							"fill": "solid"
-						},
-						"lineWidth": 1,
-						"pointSize": 5,
-						"scaleDistribution": {
-							"type": "linear"
-						},
-						"showPoints": "auto",
-						"spanNulls": false,
-						"stacking": {
-							"group": "A",
-							"mode": "none"
-						},
-						"thresholdsStyle": {
-							"mode": "off"
-						}
-					},
-					"mappings": [],
-					"thresholds": {
-						"mode": "absolute",
-						"steps": [
-							{
-								"color": "green"
-							},
-							{
-								"color": "red",
-								"value": 80
-							}
-						]
-					},
-					"unit": "decbytes"
-				},
-				"overrides": []
-			},
-			"gridPos": {
-				"h": 9,
-				"w": 11,
-				"x": 13,
-				"y": 0
-			},
-			"id": 6,
-			"options": {
-				"legend": {
-					"calcs": [],
-					"displayMode": "list",
-					"placement": "bottom",
-					"showLegend": true
-				},
-				"tooltip": {
-					"hideZeros": false,
-					"mode": "single",
-					"sort": "none"
-				}
-			},
-			"pluginVersion": "11.6.0",
-			"targets": [
-				{
-					"datasource": {
-						"type": "prometheus",
-						"uid": "Q0WJOQ3FF3HET6FH"
-					},
-					"disableTextWrap": false,
-					"editorMode": "code",
-					"expr": "dvr_upload_byte_count",
-					"fullMetaSearch": false,
-					"includeNullMetadata": true,
-					"instant": false,
-					"legendFormat": "__auto",
-					"range": true,
-					"refId": "A",
-					"useBackend": false
-				}
-			],
-			"title": "Total uploaded bytes",
-			"type": "timeseries"
+			"title": "Upload success rate",
+			"type": "gauge"
 		},
 		{
 			"datasource": {
@@ -362,10 +203,10 @@
 			"gridPos": {
 				"h": 4,
 				"w": 3,
-				"x": 0,
-				"y": 5
+				"x": 3,
+				"y": 6
 			},
-			"id": 1,
+			"id": 11,
 			"options": {
 				"colorMode": "value",
 				"graphMode": "area",
@@ -381,7 +222,7 @@
 				"textMode": "auto",
 				"wideLayout": true
 			},
-			"pluginVersion": "11.6.0",
+			"pluginVersion": "12.0.0",
 			"targets": [
 				{
 					"datasource": {
@@ -390,7 +231,7 @@
 					},
 					"disableTextWrap": false,
 					"editorMode": "code",
-					"expr": "sum(increase(dvr_upload_attempt_count[$__range]))",
+					"expr": "sum(increase(dvr_upload_attempt_count{storage=\"azure\"}[$__range]))",
 					"fullMetaSearch": false,
 					"includeNullMetadata": true,
 					"instant": false,
@@ -429,10 +270,10 @@
 			"gridPos": {
 				"h": 4,
 				"w": 3,
-				"x": 3,
-				"y": 5
+				"x": 6,
+				"y": 6
 			},
-			"id": 2,
+			"id": 13,
 			"options": {
 				"colorMode": "value",
 				"graphMode": "area",
@@ -448,7 +289,7 @@
 				"textMode": "auto",
 				"wideLayout": true
 			},
-			"pluginVersion": "11.6.0",
+			"pluginVersion": "12.0.0",
 			"targets": [
 				{
 					"datasource": {
@@ -457,7 +298,7 @@
 					},
 					"disableTextWrap": false,
 					"editorMode": "code",
-					"expr": "sum(increase(dvr_upload_success_count[$__range]))",
+					"expr": "sum(increase(dvr_upload_success_count{storage=\"azure\"}[$__range]))",
 					"fullMetaSearch": false,
 					"includeNullMetadata": true,
 					"instant": false,
@@ -496,10 +337,10 @@
 			"gridPos": {
 				"h": 4,
 				"w": 3,
-				"x": 6,
-				"y": 5
+				"x": 9,
+				"y": 6
 			},
-			"id": 3,
+			"id": 15,
 			"options": {
 				"colorMode": "value",
 				"graphMode": "area",
@@ -515,7 +356,7 @@
 				"textMode": "auto",
 				"wideLayout": true
 			},
-			"pluginVersion": "11.6.0",
+			"pluginVersion": "12.0.0",
 			"targets": [
 				{
 					"datasource": {
@@ -524,7 +365,294 @@
 					},
 					"disableTextWrap": false,
 					"editorMode": "code",
-					"expr": "sum_over_time(dvr_upload_failure_count[$__interval])",
+					"expr": "sum_over_time(dvr_upload_failure_count{storage=\"azure\"}[$__interval])",
+					"fullMetaSearch": false,
+					"includeNullMetadata": true,
+					"instant": false,
+					"legendFormat": "__auto",
+					"range": true,
+					"refId": "A",
+					"useBackend": false
+				}
+			],
+			"title": "Upload failures",
+			"type": "stat"
+		},
+		{
+			"collapsed": false,
+			"gridPos": {
+				"h": 1,
+				"w": 24,
+				"x": 0,
+				"y": 10
+			},
+			"id": 8,
+			"panels": [],
+			"title": "S3",
+			"type": "row"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "Q0WJOQ3FF3HET6FH"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "thresholds"
+					},
+					"mappings": [],
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "red"
+							},
+							{
+								"color": "#EAB839",
+								"value": 95
+							},
+							{
+								"color": "green",
+								"value": 99
+							}
+						]
+					},
+					"unit": "percent"
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 4,
+				"w": 3,
+				"x": 0,
+				"y": 11
+			},
+			"id": 17,
+			"options": {
+				"minVizHeight": 75,
+				"minVizWidth": 75,
+				"orientation": "auto",
+				"reduceOptions": {
+					"calcs": ["lastNotNull"],
+					"fields": "",
+					"values": false
+				},
+				"showThresholdLabels": false,
+				"showThresholdMarkers": true,
+				"sizing": "auto"
+			},
+			"pluginVersion": "12.0.0",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "Q0WJOQ3FF3HET6FH"
+					},
+					"disableTextWrap": false,
+					"editorMode": "code",
+					"expr": "(sum(dvr_upload_success_count{storage=\"s3\"} > 0) or vector(0))\r\n  /\r\nsum(dvr_upload_attempt_count{storage=\"s3\"} > 0) * 100",
+					"fullMetaSearch": false,
+					"includeNullMetadata": true,
+					"instant": false,
+					"legendFormat": "__auto",
+					"range": true,
+					"refId": "A",
+					"useBackend": false
+				}
+			],
+			"title": "Upload success rate",
+			"type": "gauge"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "Q0WJOQ3FF3HET6FH"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "thresholds"
+					},
+					"mappings": [],
+					"noValue": "0",
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "yellow"
+							}
+						]
+					}
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 4,
+				"w": 3,
+				"x": 3,
+				"y": 11
+			},
+			"id": 12,
+			"options": {
+				"colorMode": "value",
+				"graphMode": "area",
+				"justifyMode": "auto",
+				"orientation": "auto",
+				"percentChangeColorMode": "standard",
+				"reduceOptions": {
+					"calcs": ["lastNotNull"],
+					"fields": "",
+					"values": false
+				},
+				"showPercentChange": false,
+				"textMode": "auto",
+				"wideLayout": true
+			},
+			"pluginVersion": "12.0.0",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "Q0WJOQ3FF3HET6FH"
+					},
+					"disableTextWrap": false,
+					"editorMode": "code",
+					"expr": "sum(increase(dvr_upload_attempt_count{storage=\"s3\"}[$__range]))",
+					"fullMetaSearch": false,
+					"includeNullMetadata": true,
+					"instant": false,
+					"legendFormat": "__auto",
+					"range": true,
+					"refId": "A",
+					"useBackend": false
+				}
+			],
+			"title": "Upload attempts",
+			"type": "stat"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "Q0WJOQ3FF3HET6FH"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "thresholds"
+					},
+					"mappings": [],
+					"noValue": "0",
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "green"
+							}
+						]
+					}
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 4,
+				"w": 3,
+				"x": 6,
+				"y": 11
+			},
+			"id": 14,
+			"options": {
+				"colorMode": "value",
+				"graphMode": "area",
+				"justifyMode": "auto",
+				"orientation": "auto",
+				"percentChangeColorMode": "standard",
+				"reduceOptions": {
+					"calcs": ["lastNotNull"],
+					"fields": "",
+					"values": false
+				},
+				"showPercentChange": false,
+				"textMode": "auto",
+				"wideLayout": true
+			},
+			"pluginVersion": "12.0.0",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "Q0WJOQ3FF3HET6FH"
+					},
+					"disableTextWrap": false,
+					"editorMode": "code",
+					"expr": "sum(increase(dvr_upload_success_count{storage=\"s3\"}[$__range]))",
+					"fullMetaSearch": false,
+					"includeNullMetadata": true,
+					"instant": false,
+					"legendFormat": "__auto",
+					"range": true,
+					"refId": "A",
+					"useBackend": false
+				}
+			],
+			"title": "Upload successes",
+			"type": "stat"
+		},
+		{
+			"datasource": {
+				"type": "prometheus",
+				"uid": "Q0WJOQ3FF3HET6FH"
+			},
+			"fieldConfig": {
+				"defaults": {
+					"color": {
+						"mode": "thresholds"
+					},
+					"mappings": [],
+					"noValue": "0",
+					"thresholds": {
+						"mode": "absolute",
+						"steps": [
+							{
+								"color": "red"
+							}
+						]
+					}
+				},
+				"overrides": []
+			},
+			"gridPos": {
+				"h": 4,
+				"w": 3,
+				"x": 9,
+				"y": 11
+			},
+			"id": 16,
+			"options": {
+				"colorMode": "value",
+				"graphMode": "area",
+				"justifyMode": "auto",
+				"orientation": "auto",
+				"percentChangeColorMode": "standard",
+				"reduceOptions": {
+					"calcs": ["lastNotNull"],
+					"fields": "",
+					"values": false
+				},
+				"showPercentChange": false,
+				"textMode": "auto",
+				"wideLayout": true
+			},
+			"pluginVersion": "12.0.0",
+			"targets": [
+				{
+					"datasource": {
+						"type": "prometheus",
+						"uid": "Q0WJOQ3FF3HET6FH"
+					},
+					"disableTextWrap": false,
+					"editorMode": "code",
+					"expr": "sum_over_time(dvr_upload_failure_count{storage=\"s3\"}[$__interval])",
 					"fullMetaSearch": false,
 					"includeNullMetadata": true,
 					"instant": false,
@@ -541,7 +669,7 @@
 	"preload": false,
 	"refresh": "5s",
 	"schemaVersion": 41,
-	"tags": [],
+	"tags": ["SRS"],
 	"templating": {
 		"list": []
 	},
@@ -553,5 +681,5 @@
 	"timezone": "browser",
 	"title": "DVR stats",
 	"uid": "eehd0djvbyq68c",
-	"version": 17
+	"version": 20
 }
