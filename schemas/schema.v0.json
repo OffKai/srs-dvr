@@ -46,7 +46,15 @@
 					"type": "string",
 					"enum": ["azure", "s3"],
 					"description": "Default storage provider to use"
-				},
+				}
+			},
+			"required": ["dataRoot", "defaultStorage"],
+			"additionalProperties": false,
+			"description": "Settings for storage"
+		},
+		"providers": {
+			"type": "object",
+			"properties": {
 				"azure": {
 					"type": "object",
 					"properties": {
@@ -119,12 +127,10 @@
 					"description": "Settings for S3-compatible storage"
 				}
 			},
-			"required": ["dataRoot", "defaultStorage", "azure", "s3"],
-			"additionalProperties": false,
-			"description": "Settings for storage"
+			"additionalProperties": false
 		}
 	},
-	"required": ["dvr", "metrics", "storage"],
+	"required": ["dvr", "metrics", "storage", "providers"],
 	"additionalProperties": false,
 	"description": "DVR configuration",
 	"$schema": "http://json-schema.org/draft-07/schema#"

@@ -1,8 +1,8 @@
 import { createReadStream, ReadStream } from 'node:fs';
 import { server } from '../../server.js';
-import type { UploadFunc } from '../../lib/types/srs.js';
+import type { UploadFunc } from '../../lib/types/dvr.js';
 import type { BlockBlobUploadStreamOptions } from '@azure/storage-blob';
-import { azureClient } from './client.js';
+import { getAzureContainerClient } from './client.js';
 
 const BLOCK_BUFFER_SIZE_BYTES = 8 * 1024 * 1024; // 8MB
 const MAX_CONCURRENCY = 5;
@@ -13,6 +13,8 @@ const MAX_CONCURRENCY = 5;
  * @param path - The path to the file
  */
 export const azureUpload: UploadFunc = async (uploadPath, filePath, options) => {
+	const azureConfig = server.getProviderConfig('azure');
+	const azureClient = await getAzureContainerClient();
 	const blockClient = azureClient.getBlockBlobClient(uploadPath);
 
 	server.log.info(`uploading file: ${filePath}`);
@@ -25,8 +27,8 @@ export const azureUpload: UploadFunc = async (uploadPath, filePath, options) => 
 		const opts: BlockBlobUploadStreamOptions = {};
 
 		// 'default' uses the account's access tier setting, so we don't need to set it
-		if (server.config.storage.azure.accessTier !== 'default') {
-			opts.tier = server.config.storage.azure.accessTier;
+		if (azureConfig.accessTier !== 'default') {
+			opts.tier = azureConfig.accessTier;
 		}
 
 		await blockClient.uploadStream(stream, BLOCK_BUFFER_SIZE_BYTES, MAX_CONCURRENCY, opts);

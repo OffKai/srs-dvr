@@ -19,7 +19,9 @@ export async function loadConfig(): Promise<DvrConfig> {
 			storage: {
 				autoCleanup: true,
 				dataRoot: '/test_dir',
-				defaultStorage: 'azure',
+				defaultStorage: 'azure'
+			},
+			providers: {
 				azure: {
 					accountName: 'account',
 					accountKey: 'key',

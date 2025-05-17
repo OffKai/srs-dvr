@@ -4,7 +4,8 @@ import { DvrWebhookSchema } from '../../lib/utils/constants.js';
 import { basename } from 'node:path';
 import { rm } from 'node:fs/promises';
 import type { FastifyPluginCallback } from 'fastify';
-import type { DvrWebhookPayload, TrackerEntry } from '../../lib/types/srs.js';
+import type { DvrWebhookPayload } from '../../lib/types/srs.js';
+import type { TrackerEntry } from '../../lib/types/dvr.js';
 
 export const azureRoutes: FastifyPluginCallback = (server) => {
 	server.post<{ Body: DvrWebhookPayload }>(
