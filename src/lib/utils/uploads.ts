@@ -3,6 +3,7 @@ import { azureUpload } from '../../storage/azure/upload.js';
 import { fmtUploadPath, resolveFilePath } from './fs.js';
 import { server } from '../../server.js';
 import { join } from 'node:path';
+import { s3Upload } from '../../storage/s3/upload.js';
 
 export async function restartUploads(): Promise<void> {
 	let count = 0;
@@ -24,45 +25,75 @@ export async function restartUploads(): Promise<void> {
 		for (const stream of await readdir(appPath)) {
 			const streamPath = join(appPath, stream);
 
-			for (const file of await readdir(streamPath)) {
-				const path = join(streamPath, file);
+			for (const filename of await readdir(streamPath)) {
+				const path = join(streamPath, filename);
 
-				if (!file.endsWith('.flv') || server.tracker.has(path)) {
+				if (!filename.endsWith('.flv') || server.tracker.has(path)) {
 					continue;
 				}
 
 				total += 1;
 
-				if (server.config.storage.defaultStorage === 'azure') {
-					// TODO - Move this above when/if more storage options are added
-					server.tracker.set(path, {
-						app,
-						stream,
-						filename: file,
-						path,
-						storage: 'azure',
-						date: new Date().toISOString()
-					});
+				const now = new Date().toISOString();
+				const uploadPath = fmtUploadPath({
+					app,
+					stream,
+					filename
+				});
 
-					const uploadPath = fmtUploadPath({
-						app,
-						stream,
-						filename: file
-					});
+				switch (server.config.storage.defaultStorage) {
+					case 'azure': {
+						server.tracker.set(path, {
+							app,
+							stream,
+							filename,
+							path,
+							storage: 'azure',
+							date: now
+						});
 
-					server.metrics?.upload.attempt.inc({ storage: 'azure' });
+						server.metrics?.upload.attempt.inc({ storage: 'azure' });
 
-					await azureUpload(uploadPath, path, {
-						onComplete: () => {
-							count += 1;
-							server.metrics?.upload.success.inc({ storage: 'azure' });
-							server.tracker.delete(path);
-						},
-						onFailure: () => {
-							server.metrics?.upload.failure.inc({ storage: 'azure' });
-							server.tracker.delete(path);
-						}
-					});
+						await azureUpload(uploadPath, path, {
+							onComplete: () => {
+								count += 1;
+								server.metrics?.upload.success.inc({ storage: 'azure' });
+								server.tracker.delete(path);
+							},
+							onFailure: () => {
+								server.metrics?.upload.failure.inc({ storage: 'azure' });
+								server.tracker.delete(path);
+							}
+						});
+						break;
+					}
+					case 's3': {
+						server.tracker.set(path, {
+							app,
+							stream,
+							filename,
+							path,
+							storage: 's3',
+							date: now
+						});
+
+						server.metrics?.upload.attempt.inc({ storage: 's3' });
+
+						await s3Upload(uploadPath, path, {
+							onComplete: () => {
+								count += 1;
+								server.metrics?.upload.success.inc({ storage: 's3' });
+								server.tracker.delete(path);
+							},
+							onFailure: () => {
+								server.metrics?.upload.failure.inc({ storage: 's3' });
+								server.tracker.delete(path);
+							}
+						});
+						break;
+					}
+					default:
+						server.log.error(`invalid storage type: ${server.config.storage.defaultStorage}`);
 				}
 			}
 		}
