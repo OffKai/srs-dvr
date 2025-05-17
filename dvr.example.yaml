@@ -10,6 +10,8 @@ storage:
   autoCleanup: false
   dataRoot: /data
   defaultStorage: s3
+
+providers:
   azure:
     accountName: ${DVR_AZURE_ACCOUNT_NAME}
     accountKey: ${DVR_AZURE_ACCOUNT_KEY}

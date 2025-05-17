@@ -1,44 +1,8 @@
 import type { Unvalidated } from '../types/generic.js';
-import { hydrateYaml, readEnvVar } from './parser.js';
+import { hydrateYaml } from './parser.js';
 import type { DvrConfig } from './schema.js';
 
 describe('parser', () => {
-	describe('readEnvVar', () => {
-		it('should substitute string', () => {
-			vi.stubEnv('TEST_ENV_VAR', 'test_value');
-
-			const result = readEnvVar('TEST_ENV_VAR');
-			expect(result).toBe('test_value');
-		});
-
-		it('should substitute number', () => {
-			vi.stubEnv('TEST_ENV_VAR', '5');
-
-			const result = readEnvVar('TEST_ENV_VAR');
-			expect(result).toBe(5);
-		});
-
-		it('should substitute true', () => {
-			vi.stubEnv('TEST_ENV_VAR', 'true');
-
-			const result = readEnvVar('TEST_ENV_VAR');
-			expect(result).toBe(true);
-		});
-
-		it('should substitute false', () => {
-			vi.stubEnv('TEST_ENV_VAR', 'false');
-
-			const result = readEnvVar('TEST_ENV_VAR');
-			expect(result).toBe(false);
-		});
-
-		it('should throw with invalid key', () => {
-			expect(() => {
-				readEnvVar('INVALID_KEY');
-			}).toThrow('Environment variable "INVALID_KEY" is not defined');
-		});
-	});
-
 	describe('hydrateYaml', () => {
 		it('should hydrate config', () => {
 			vi.stubEnv('DVR_METRICS_PORT', '3002');
@@ -65,7 +29,9 @@ describe('parser', () => {
 				storage: {
 					autoCleanup: '${DVR_STORAGE_AUTO_CLEANUP}',
 					dataRoot: '${DVR_STORAGE_DATA_ROOT}',
-					defaultStorage: '${DVR_STORAGE_DEFAULT}',
+					defaultStorage: '${DVR_STORAGE_DEFAULT}'
+				},
+				providers: {
 					azure: {
 						accountName: '${DVR_AZURE_ACCOUNT_NAME}',
 						accountKey: '${DVR_AZURE_ACCOUNT_KEY}',
@@ -89,13 +55,15 @@ describe('parser', () => {
 					port: 3001
 				},
 				metrics: {
-					port: 3002,
+					port: '3002',
 					enabled: true
 				},
 				storage: {
-					autoCleanup: true,
+					autoCleanup: 'true',
 					dataRoot: '/tmp/dvr',
-					defaultStorage: 'azure',
+					defaultStorage: 'azure'
+				},
+				providers: {
 					azure: {
 						accountName: 'account_name',
 						accountKey: 'account_key',
@@ -112,7 +80,7 @@ describe('parser', () => {
 						minio: true
 					}
 				}
-			} satisfies DvrConfig);
+			});
 		});
 	});
 });

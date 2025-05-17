@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import type { StorageTypes } from '../types/srs.js';
+import type { StorageTypes } from '../types/dvr.js';
 
 const AzureSchema = z
 	.object({
@@ -104,13 +104,17 @@ export const DvrConfigSchema = z
 				/** Default storage provider to use. */
 				defaultStorage: z //
 					.enum<StorageTypes, [StorageTypes, ...StorageTypes[]]>(['azure', 's3'])
-					.describe('Default storage provider to use'),
-				/** Settings for Azure Blob Storage */
-				azure: AzureSchema,
-				s3: S3Schema
+					.describe('Default storage provider to use')
 			})
-			.describe('Settings for storage')
+			.describe('Settings for storage'),
+		providers: z.object({
+			/** Settings for Azure Blob Storage */
+			azure: AzureSchema.optional(),
+			s3: S3Schema.optional()
+		})
 	})
 	.describe('DVR configuration');
 
+export type AzureConfig = z.infer<typeof AzureSchema>;
+export type S3Config = z.infer<typeof S3Schema>;
 export type DvrConfig = z.infer<typeof DvrConfigSchema>;

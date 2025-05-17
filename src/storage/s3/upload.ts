@@ -1,10 +1,8 @@
 import { createReadStream, ReadStream } from 'node:fs';
 import { server } from '../../server.js';
-import type { UploadFunc } from '../../lib/types/srs.js';
+import type { UploadFunc } from '../../lib/types/dvr.js';
 import { PutObjectCommand, type PutObjectCommandInput } from '@aws-sdk/client-s3';
-import { s3Client } from './client.js';
-
-const { s3 } = server.config.storage;
+import { getS3Client } from './client.js';
 
 /**
  * Upload a file to S3-compatible storage
@@ -13,6 +11,9 @@ const { s3 } = server.config.storage;
  * @param options - Options for the upload
  */
 export const s3Upload: UploadFunc = async (uploadPath, filePath, options) => {
+	const s3Config = server.getProviderConfig('s3');
+	const s3Client = await getS3Client();
+
 	server.log.info(`uploading file: ${filePath}`);
 
 	let stream: ReadStream | undefined;
@@ -20,13 +21,13 @@ export const s3Upload: UploadFunc = async (uploadPath, filePath, options) => {
 		stream = createReadStream(filePath);
 
 		const input: PutObjectCommandInput = {
-			Bucket: s3.bucket,
+			Bucket: s3Config.bucket,
 			Key: uploadPath,
 			Body: stream
 		};
 
-		if (s3.storageClass !== 'DEFAULT') {
-			input.StorageClass = s3.storageClass;
+		if (s3Config.storageClass !== 'DEFAULT') {
+			input.StorageClass = s3Config.storageClass;
 		}
 
 		const command = new PutObjectCommand(input);

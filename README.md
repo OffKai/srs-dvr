@@ -65,6 +65,9 @@ storage:
   dataRoot: <string>
   # Default storage provider to use
   defaultStorage: <enum> # one of: azure, s3
+
+# At least one provider needs to be defined
+providers:
   azure:
     # Azure Blob Storage account name
     accountName: <string>
@@ -100,6 +103,14 @@ DVR_PORT="4000"
 # dvr.config.yaml
 dvr:
   port: ${DVR_PORT} # resolves to: 4000
+```
+
+Default values can also be provided with `:=`:
+
+```yaml
+# dvr.config.yaml
+dvr:
+  port: ${NOT_A_VAR:=4000} # resolves to: 4000
 ```
 
 ### Query parameters

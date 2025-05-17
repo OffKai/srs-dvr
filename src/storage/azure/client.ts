@@ -2,22 +2,28 @@ import { BlobServiceClient, ContainerClient, StorageSharedKeyCredential } from '
 import { server } from '../../server.js';
 import { isTesting } from '../../lib/utils/constants.js';
 
-const { azure } = server.config.storage;
+let cachedClient: ContainerClient | null = null;
 
-const client = new BlobServiceClient(
-	`https://${azure.accountName}.blob.core.windows.net`, //
-	new StorageSharedKeyCredential(azure.accountName, azure.accountKey),
-	{
-		retryOptions: {
-			maxTries: 5
-		},
-		keepAliveOptions: {
-			enable: true
-		}
+export async function getAzureContainerClient(): Promise<ContainerClient> {
+	if (cachedClient) {
+		return cachedClient;
 	}
-);
 
-async function getAzureContainerClient(): Promise<ContainerClient> {
+	const azure = server.getProviderConfig('azure');
+
+	const client = new BlobServiceClient(
+		`https://${azure.accountName}.blob.core.windows.net`, //
+		new StorageSharedKeyCredential(azure.accountName, azure.accountKey),
+		{
+			retryOptions: {
+				maxTries: 5
+			},
+			keepAliveOptions: {
+				enable: true
+			}
+		}
+	);
+
 	if (isTesting) {
 		throw new Error('azure client is not supported in testing mode');
 	}
@@ -29,7 +35,6 @@ async function getAzureContainerClient(): Promise<ContainerClient> {
 		throw new Error(`Blob container "${azure.containerName}" does not exist`);
 	}
 
+	cachedClient = containerClient;
 	return containerClient;
 }
-
-export const azureClient = await getAzureContainerClient();

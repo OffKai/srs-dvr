@@ -3,7 +3,7 @@ import yaml from 'yaml';
 import { readFile } from 'node:fs/promises';
 import { CONFIG_PATH } from '../utils/constants.js';
 
-const SUBSTITUTE_REGEX = /^\$\{(\w+)\}$/;
+const SUBSTITUTE_REGEX = /^\$\{(\w+)(?::=)?([^}]+)?\}$/;
 
 export async function getYamlConfig(path = CONFIG_PATH): Promise<Record<string, unknown>> {
 	if (!existsSync(path)) {
@@ -25,7 +25,11 @@ export function hydrateYaml(obj: Record<string, unknown>): Record<string, unknow
 		if (typeof value === 'string') {
 			const match = SUBSTITUTE_REGEX.exec(value);
 			if (match) {
-				obj[key] = readEnvVar(match[1]);
+				if (match[2]) {
+					obj[key] = process.env[match[1]] || match[2];
+				} else if (match) {
+					obj[key] = process.env[match[1]];
+				}
 			}
 		} else if (Array.isArray(value)) {
 			obj[key] = value.map((item) => hydrateYaml(item));
@@ -36,24 +40,3 @@ export function hydrateYaml(obj: Record<string, unknown>): Record<string, unknow
 
 	return obj;
 }
-
-export const readEnvVar = (key: string) => {
-	const value = process.env[key];
-
-	if (value === undefined) {
-		throw new Error(`Environment variable "${key}" is not defined`);
-	}
-
-	if (value === 'true') {
-		return true;
-	} else if (value === 'false') {
-		return false;
-	}
-
-	const coerce = Number.parseInt(value, 10);
-	if (!Number.isNaN(coerce)) {
-		return coerce;
-	}
-
-	return value;
-};

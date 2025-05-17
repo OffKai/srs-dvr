@@ -9,6 +9,13 @@ export const routes: FastifyPluginAsync = async (server) => {
 		await res.status(200).send('OK');
 	});
 
+	server.get('/routes', async (_, res) => {
+		await res //
+			.status(200)
+			.header('Content-Type', 'text/plain; charset=utf-8')
+			.send(server.printRoutes());
+	});
+
 	server.post('/retry', async (_, res) => {
 		server.log.info('retrying uploads');
 
