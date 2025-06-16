@@ -4,7 +4,7 @@ providers:
   - name: "Dashboard provider"
     orgId: 1
     type: file
-    disableDeletion: false
+    disableDeletion: true
     updateIntervalSeconds: 10
     allowUiUpdates: true
     options:

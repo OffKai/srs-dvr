@@ -58,6 +58,7 @@ metrics:
 storage:
   # Enable automatic cleanup of uploaded files
   autoCleanup: [boolean=true]
+  autoUpload: [boolean=true]
   # Base path that SRS recordings are written to
   # Example:
   #     /data/[app]/[stream]/[timestamp].flv;       -> /data

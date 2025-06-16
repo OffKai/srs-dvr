@@ -8,6 +8,7 @@ metrics:
 
 storage:
   autoCleanup: false
+  autoUpload: false
   dataRoot: /data
   defaultStorage: s3
 

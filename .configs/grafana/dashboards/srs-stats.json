@@ -1512,8 +1512,8 @@
 			},
 			{
 				"current": {
-					"text": ["All"],
-					"value": ["$__all"]
+					"text": "All",
+					"value": "$__all"
 				},
 				"datasource": {
 					"type": "prometheus",
@@ -1557,7 +1557,7 @@
 			{
 				"current": {
 					"text": "All",
-					"value": ["$__all"]
+					"value": "$__all"
 				},
 				"datasource": {
 					"type": "prometheus",
@@ -1586,5 +1586,5 @@
 	"timezone": "",
 	"title": "SRS stats",
 	"uid": "G_72d_7Vk",
-	"version": 6
+	"version": 7
 }

@@ -20,7 +20,9 @@ const start = async (): Promise<void> => {
 
 		await printInfo(host);
 
-		await restartUploads();
+		if (server.config.storage.autoUpload) {
+			await restartUploads();
+		}
 	} catch (err: unknown) {
 		server.log.error(err);
 
@@ -54,6 +56,7 @@ const printInfo = async (host: string) => {
 	server.log.info(`  Default:         ${storage.defaultStorage}`);
 	server.log.info(`  Data root:       ${storage.dataRoot}`);
 	server.log.info(`  Auto-clean:      ${storage.autoCleanup ? 'enabled' : 'disabled'}`);
+	server.log.info(`  Auto-upload:     ${storage.autoUpload ? 'enabled' : 'disabled'}`);
 
 	server.log.info('Providers');
 

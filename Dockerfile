@@ -1,5 +1,5 @@
 ## Base ##
-FROM node:22.15.0-alpine3.21 AS base
+FROM node:22.16.0-alpine3.21 AS base
 
 RUN apk update --no-cache
 

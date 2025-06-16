@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from 'zod/v4';
 import type { StorageTypes } from '../types/dvr.js';
 
 const AzureSchema = z
@@ -97,13 +97,17 @@ export const DvrConfigSchema = z
 					.boolean()
 					.default(true)
 					.describe('Enable automatic cleanup of uploaded files'),
+				autoUpload: z //
+					.boolean()
+					.default(true)
+					.describe('Enable automatic uploads on restart'),
 				/** Root directory that recordings are stored in. */
 				dataRoot: z //
 					.string()
 					.describe('Root directory that recordings are stored in'),
 				/** Default storage provider to use. */
 				defaultStorage: z //
-					.enum<StorageTypes, [StorageTypes, ...StorageTypes[]]>(['azure', 's3'])
+					.enum(['azure', 's3'] satisfies StorageTypes[])
 					.describe('Default storage provider to use')
 			})
 			.describe('Settings for storage'),

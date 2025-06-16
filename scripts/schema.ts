@@ -1,17 +1,16 @@
-import { zodToJsonSchema } from 'zod-to-json-schema';
 import { DvrConfigSchema } from '../src/lib/config/schema.js';
 import { resolve } from 'node:path';
 import { writeFile } from 'node:fs/promises';
 import prettier from 'prettier';
-import type { ZodSchema } from 'zod';
+import { z } from 'zod/v4';
 
-const schemas: [string, ZodSchema][] = [
+const schemas: [string, z.core.$ZodType][] = [
 	['v0', DvrConfigSchema] //
 ];
 
 for (const [version, schema] of schemas) {
-	const jsonSchema = zodToJsonSchema(schema, {
-		target: 'jsonSchema7'
+	const jsonSchema = z.toJSONSchema(schema, {
+		target: 'draft-7'
 	});
 
 	const strSchema = JSON.stringify(jsonSchema, null, 2);

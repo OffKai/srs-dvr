@@ -8,8 +8,11 @@ metrics:
 
 storage:
   autoCleanup: true
+  autoUpload: true
   dataRoot: /data
   defaultStorage: azure
+
+providers:
   azure:
     accountName: name
     accountKey: key
@@ -22,3 +25,4 @@ storage:
     endpoint: http://localhost
     region: us-east-1
     storageClass: DEFAULT
+    minio: true

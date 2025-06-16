@@ -7,6 +7,7 @@ describe('parser', () => {
 		it('should hydrate config', () => {
 			vi.stubEnv('DVR_METRICS_PORT', '3002');
 			vi.stubEnv('DVR_STORAGE_AUTO_CLEANUP', 'true');
+			vi.stubEnv('DVR_STORAGE_AUTO_UPLOAD', 'true');
 			vi.stubEnv('DVR_STORAGE_DATA_ROOT', '/tmp/dvr');
 			vi.stubEnv('DVR_STORAGE_DEFAULT', 'azure');
 			vi.stubEnv('DVR_AZURE_ACCOUNT_NAME', 'account_name');
@@ -28,6 +29,7 @@ describe('parser', () => {
 				},
 				storage: {
 					autoCleanup: '${DVR_STORAGE_AUTO_CLEANUP}',
+					autoUpload: '${DVR_STORAGE_AUTO_UPLOAD}',
 					dataRoot: '${DVR_STORAGE_DATA_ROOT}',
 					defaultStorage: '${DVR_STORAGE_DEFAULT}'
 				},
@@ -60,6 +62,7 @@ describe('parser', () => {
 				},
 				storage: {
 					autoCleanup: 'true',
+					autoUpload: 'true',
 					dataRoot: '/tmp/dvr',
 					defaultStorage: 'azure'
 				},

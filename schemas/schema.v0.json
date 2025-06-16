@@ -1,87 +1,97 @@
 {
+	"$schema": "http://json-schema.org/draft-07/schema#",
+	"description": "DVR configuration",
 	"type": "object",
 	"properties": {
 		"dvr": {
+			"description": "General settings",
 			"type": "object",
 			"properties": {
 				"port": {
-					"type": "number",
+					"description": "Port the HTTP server should listen on",
 					"default": 3001,
-					"description": "Port the HTTP server should listen on"
+					"type": "number"
 				}
 			},
-			"additionalProperties": false,
-			"description": "General settings"
+			"required": ["port"],
+			"additionalProperties": false
 		},
 		"metrics": {
+			"description": "Settings for metrics",
 			"type": "object",
 			"properties": {
 				"enabled": {
-					"type": "boolean",
+					"description": "Enable or disable metrics collection",
 					"default": false,
-					"description": "Enable or disable metrics collection"
+					"type": "boolean"
 				},
 				"port": {
-					"type": "number",
+					"description": "Port the metrics server should listen on",
 					"default": 3002,
-					"description": "Port the metrics server should listen on"
+					"type": "number"
 				}
 			},
-			"additionalProperties": false,
-			"description": "Settings for metrics"
+			"required": ["enabled", "port"],
+			"additionalProperties": false
 		},
 		"storage": {
+			"description": "Settings for storage",
 			"type": "object",
 			"properties": {
 				"autoCleanup": {
-					"type": "boolean",
+					"description": "Enable automatic cleanup of uploaded files",
 					"default": true,
-					"description": "Enable automatic cleanup of uploaded files"
+					"type": "boolean"
+				},
+				"autoUpload": {
+					"description": "Enable automatic uploads on restart",
+					"default": true,
+					"type": "boolean"
 				},
 				"dataRoot": {
-					"type": "string",
-					"description": "Root directory that recordings are stored in"
+					"description": "Root directory that recordings are stored in",
+					"type": "string"
 				},
 				"defaultStorage": {
+					"description": "Default storage provider to use",
 					"type": "string",
-					"enum": ["azure", "s3"],
-					"description": "Default storage provider to use"
+					"enum": ["azure", "s3"]
 				}
 			},
-			"required": ["dataRoot", "defaultStorage"],
-			"additionalProperties": false,
-			"description": "Settings for storage"
+			"required": ["autoCleanup", "autoUpload", "dataRoot", "defaultStorage"],
+			"additionalProperties": false
 		},
 		"providers": {
 			"type": "object",
 			"properties": {
 				"azure": {
+					"description": "Settings for Azure Blob Storage",
 					"type": "object",
 					"properties": {
 						"accountName": {
-							"type": "string",
-							"description": "Azure Blob Storage account name"
+							"description": "Azure Blob Storage account name",
+							"type": "string"
 						},
 						"accountKey": {
-							"type": "string",
-							"description": "Azure Blob Storage account key"
+							"description": "Azure Blob Storage account key",
+							"type": "string"
 						},
 						"containerName": {
-							"type": "string",
-							"description": "Azure Blob Storage container to upload to"
+							"description": "Azure Blob Storage container to upload to",
+							"type": "string"
 						},
 						"accessTier": {
-							"type": "string",
-							"enum": ["default", "hot", "cool", "cold", "archive"],
+							"description": "Access tier for uploaded files. `default` uses the default access tier set on the account.",
 							"default": "default",
-							"description": "Access tier for uploaded files. `default` uses the default access tier set on the account."
+							"type": "string",
+							"enum": ["default", "hot", "cool", "cold", "archive"]
 						}
 					},
-					"required": ["accountName", "accountKey", "containerName"],
-					"additionalProperties": false,
-					"description": "Settings for Azure Blob Storage"
+					"required": ["accountName", "accountKey", "containerName", "accessTier"],
+					"additionalProperties": false
 				},
 				"s3": {
+					"description": "Settings for S3-compatible storage",
 					"type": "object",
 					"properties": {
 						"accessKey": {
@@ -100,6 +110,7 @@
 							"type": "string"
 						},
 						"storageClass": {
+							"default": "DEFAULT",
 							"type": "string",
 							"enum": [
 								"DEFAULT",
@@ -114,24 +125,20 @@
 								"GLACIER_IR",
 								"SNOW",
 								"EXPRESS_ONEZONE"
-							],
-							"default": "DEFAULT"
+							]
 						},
 						"minio": {
-							"type": "boolean",
-							"default": false
+							"default": false,
+							"type": "boolean"
 						}
 					},
-					"required": ["accessKey", "secretKey", "bucket", "endpoint", "region"],
-					"additionalProperties": false,
-					"description": "Settings for S3-compatible storage"
+					"required": ["accessKey", "secretKey", "bucket", "endpoint", "region", "storageClass", "minio"],
+					"additionalProperties": false
 				}
 			},
 			"additionalProperties": false
 		}
 	},
 	"required": ["dvr", "metrics", "storage", "providers"],
-	"additionalProperties": false,
-	"description": "DVR configuration",
-	"$schema": "http://json-schema.org/draft-07/schema#"
+	"additionalProperties": false
 }

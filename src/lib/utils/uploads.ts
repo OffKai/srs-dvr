@@ -1,4 +1,4 @@
-import { readdir } from 'node:fs/promises';
+import { readdir, rm } from 'node:fs/promises';
 import { azureUpload } from '../../storage/azure/upload.js';
 import { fmtUploadPath, resolveFilePath } from './fs.js';
 import { server } from '../../server.js';
@@ -65,6 +65,15 @@ export async function restartUploads(): Promise<void> {
 								server.tracker.delete(path);
 							}
 						});
+
+						if (server.config.storage.autoCleanup) {
+							try {
+								await rm(path);
+							} catch (err: unknown) {
+								server.log.error(err, `failed to delete file: ${path}`);
+							}
+						}
+
 						break;
 					}
 					case 's3': {
@@ -90,6 +99,15 @@ export async function restartUploads(): Promise<void> {
 								server.tracker.delete(path);
 							}
 						});
+
+						if (server.config.storage.autoCleanup) {
+							try {
+								await rm(path);
+							} catch (err: unknown) {
+								server.log.error(err, `failed to delete file: ${path}`);
+							}
+						}
+
 						break;
 					}
 					default:

@@ -18,6 +18,7 @@ export async function loadConfig(): Promise<DvrConfig> {
 			},
 			storage: {
 				autoCleanup: true,
+				autoUpload: true,
 				dataRoot: '/test_dir',
 				defaultStorage: 'azure'
 			},
@@ -57,8 +58,8 @@ export async function loadConfig(): Promise<DvrConfig> {
 	if (cfg.error) {
 		console.error('failed to load config');
 
-		for (const err of cfg.error.errors) {
-			console.error(`${err.path[0]}: ${err.message}`);
+		for (const err of cfg.error.issues) {
+			console.error(`${err.path[0].toString()}: ${err.message}`);
 		}
 
 		process.exit(1);

@@ -27,33 +27,35 @@
 		"prepare": "husky"
 	},
 	"dependencies": {
-		"@aws-sdk/client-s3": "^3.812.0",
+		"@aws-sdk/client-s3": "^3.828.0",
 		"@azure/storage-blob": "^12.27.0",
 		"@fastify/request-context": "^6.2.0",
-		"fastify": "^5.3.3",
+		"fastify": "^5.4.0",
 		"pino-pretty": "^13.0.0",
 		"prom-client": "^15.1.3",
 		"yaml": "^2.8.0",
-		"zod": "^3.24.4"
+		"zod": "^3.25.64"
 	},
 	"devDependencies": {
-		"@eslint/js": "^9.27.0",
-		"@types/node": "^22.15.18",
-		"@typescript-eslint/parser": "^8.32.1",
-		"@vitest/coverage-v8": "3.1.3",
-		"eslint": "^9.27.0",
+		"@eslint/js": "^9.29.0",
+		"@types/node": "^24.0.1",
+		"@typescript-eslint/parser": "^8.34.0",
+		"@vitest/coverage-v8": "3.2.3",
+		"eslint": "^9.29.0",
 		"eslint-config-prettier": "^10.1.5",
-		"eslint-plugin-prettier": "^5.4.0",
-		"globals": "^16.1.0",
+		"eslint-plugin-prettier": "^5.4.1",
+		"globals": "^16.2.0",
 		"husky": "^9.1.7",
-		"lint-staged": "^16.0.0",
+		"lint-staged": "^16.1.2",
 		"prettier": "^3.5.3",
 		"tsup": "^8.5.0",
-		"tsx": "^4.19.4",
+		"tsx": "^4.20.3",
 		"typescript": "5.8.3",
-		"typescript-eslint": "^8.32.1",
-		"vitest": "3.1.3",
-		"zod-to-json-schema": "^3.24.5"
+		"typescript-eslint": "^8.34.0",
+		"vitest": "3.2.3"
+	},
+	"resolutions": {
+		"eslint": "9.28.0"
 	},
 	"lint-staged": {
 		"*.{js,cjs,ts}": [
@@ -66,8 +68,8 @@
 	"engines": {
 		"node": "22.x"
 	},
-	"packageManager": "yarn@4.9.1",
+	"packageManager": "yarn@4.9.2",
 	"volta": {
-		"node": "22.15.0"
+		"node": "22.16.0"
 	}
 }
